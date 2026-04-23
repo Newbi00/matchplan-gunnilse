@@ -1,0 +1,1437 @@
+<!doctype html>
+<html lang="sv" data-screen-label="Matchplan — Gunnilse vs Lerum">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Matchplan — Gunnilse IS vs Lerum IS</title>
+<style>
+/* Matchplan — styles */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+:root {
+  --bg: hsl(215 30% 6%);
+  --bg-elev: hsl(217 28% 9%);
+  --bg-elev-2: hsl(217 24% 12%);
+  --fg: hsl(220 20% 96%);
+  --fg-muted: hsl(217 12% 60%);
+  --fg-dim: hsl(217 10% 45%);
+  --border: hsl(217 22% 16%);
+  --border-strong: hsl(217 20% 24%);
+  --primary: hsl(212 50% 48%);
+  --accent: hsl(47 78% 56%);
+  --accent-2: hsl(48 100% 65%);
+  --green: hsl(142 60% 45%);
+  --red: hsl(358 75% 59%);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--fg); -webkit-font-smoothing: antialiased; min-height: 100vh; }
+button, input, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; border: none; background: transparent; }
+input, textarea { background: transparent; border: none; outline: none; }
+textarea { resize: vertical; }
+
+/* -------- Background -------- */
+.app-bg { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
+.app-bg::before {
+  content: ""; position: absolute; inset: 0;
+  background:
+    radial-gradient(at 15% 10%, hsl(212 50% 48% / 0.22), transparent 50%),
+    radial-gradient(at 85% 20%, hsl(47 78% 56% / 0.10), transparent 55%),
+    radial-gradient(at 50% 90%, hsl(217 30% 12% / 0.6), transparent 60%);
+  filter: blur(30px);
+}
+
+/* -------- Top bar -------- */
+.topbar { position: sticky; top: 0; z-index: 50; backdrop-filter: blur(20px); background: hsl(215 30% 6% / 0.75); border-bottom: 1px solid var(--border); }
+.topbar-inner { max-width: 1400px; margin: 0 auto; padding: 14px 28px; display: flex; align-items: center; gap: 24px; }
+.brand { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.brand-badge { width: 32px; height: 32px; border-radius: 6px; background: var(--bg-elev); border: 1px solid var(--border); color: var(--accent); display: grid; place-items: center; font-family: ui-monospace, Menlo, monospace; font-weight: 900; font-size: 14px; }
+.brand-name { font-weight: 800; letter-spacing: -0.02em; font-size: 14px; }
+.brand-name .yr { color: var(--accent); margin-left: 4px; }
+
+.match-meta { display: flex; align-items: center; gap: 18px; flex: 1; }
+.match-meta .vs { font-size: 11px; font-weight: 700; color: var(--fg-muted); letter-spacing: 0.2em; text-transform: uppercase; }
+.match-meta h1 { font-size: 20px; font-weight: 900; letter-spacing: -0.02em; }
+.match-meta h1 .opp { color: var(--accent); }
+.match-meta .dots { display: flex; gap: 14px; font-size: 12px; color: var(--fg-muted); }
+.match-meta .dots span::before { content: "·"; margin-right: 14px; color: var(--fg-dim); }
+.match-meta .dots span:first-child::before { content: none; }
+
+.variant-toggle { display: flex; background: var(--bg-elev); border: 1px solid var(--border); border-radius: 8px; padding: 3px; gap: 2px; }
+.variant-toggle button { padding: 6px 12px; font-size: 12px; font-weight: 600; color: var(--fg-muted); border-radius: 6px; transition: all .2s; }
+.variant-toggle button.is-active { background: var(--bg-elev-2); color: var(--fg); box-shadow: 0 1px 0 hsl(0 0% 100% / 0.04) inset; }
+.variant-toggle button:hover:not(.is-active) { color: var(--fg); }
+
+/* -------- Eyebrow -------- */
+.eyebrow { font-size: 10px; font-weight: 700; color: var(--accent); letter-spacing: 0.28em; text-transform: uppercase; }
+.eyebrow-mono { font-family: ui-monospace, Menlo, monospace; font-size: 10px; font-weight: 700; color: var(--accent); letter-spacing: 0.18em; text-transform: uppercase; }
+.section-num { font-family: ui-monospace, Menlo, monospace; font-size: 11px; font-weight: 700; color: var(--accent); letter-spacing: 0.12em; }
+.section-h { font-size: 28px; font-weight: 900; letter-spacing: -0.025em; line-height: 1.1; }
+
+/* -------- Cards -------- */
+.card { background: var(--bg-elev); border: 1px solid var(--border); border-radius: 14px; }
+.card-head { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: baseline; gap: 12px; }
+.card-head .lbl { font-size: 15px; font-weight: 800; letter-spacing: -0.01em; }
+.card-head .num { font-family: ui-monospace, Menlo, monospace; font-size: 11px; color: var(--accent); font-weight: 700; letter-spacing: 0.1em; }
+.card-body { padding: 18px 20px; }
+
+/* -------- Editable field -------- */
+.ed, .ed-ta { display: block; width: 100%; padding: 6px 8px; border-radius: 6px; background: transparent; border: 1px dashed transparent; transition: all .15s; font-size: 13px; line-height: 1.55; color: var(--fg); }
+.ed:hover, .ed-ta:hover { border-color: var(--border-strong); background: hsl(0 0% 100% / 0.015); }
+.ed:focus, .ed-ta:focus { border-color: var(--accent); border-style: solid; background: hsl(0 0% 100% / 0.03); }
+.ed-ta { min-height: 48px; resize: vertical; }
+.ed-small { font-size: 12px; padding: 4px 6px; }
+
+/* -------- Layout wrappers -------- */
+.page { max-width: 1400px; margin: 0 auto; padding: 32px 28px 80px; }
+
+/* Variant A — Koherens-flöde (single column story) */
+.flow { display: grid; grid-template-columns: minmax(0, 2fr) minmax(320px, 1fr); gap: 28px; align-items: start; }
+.flow-main { display: flex; flex-direction: column; gap: 24px; }
+.flow-side { position: sticky; top: 100px; display: flex; flex-direction: column; gap: 20px; }
+.section-card { background: var(--bg-elev); border: 1px solid var(--border); border-radius: 16px; padding: 28px 32px; position: relative; overflow: hidden; }
+.section-card::before { content: ""; position: absolute; top: 28px; bottom: 28px; left: 0; width: 3px; background: var(--accent); border-radius: 0 3px 3px 0; }
+.section-card .sec-head { display: flex; align-items: baseline; gap: 16px; margin-bottom: 8px; }
+.section-card .sec-sub { color: var(--fg-muted); font-size: 13px; margin-top: 10px; font-style: italic; }
+.section-card .sec-body { margin-top: 18px; }
+
+.principles-row { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 14px 0; }
+.principle-chip { font-size: 11px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); background: hsl(47 78% 56% / 0.08); border: 1px solid hsl(47 78% 56% / 0.35); padding: 5px 10px; border-radius: 999px; white-space: nowrap; }
+
+.sec-note { margin-top: 6px; font-size: 13px; color: var(--fg-dim); font-style: italic; line-height: 1.5; }
+
+.bullets { display: flex; flex-direction: column; gap: 6px; }
+.bullet-row { display: grid; grid-template-columns: 22px 1fr auto; align-items: start; gap: 10px; padding: 4px 2px; }
+.bullet-row .dot { width: 6px; height: 6px; background: var(--accent); border-radius: 50%; margin-top: 9px; }
+.bullet-row .x { font-size: 14px; color: var(--fg-dim); padding: 4px 6px; border-radius: 4px; opacity: 0; }
+.bullet-row:hover .x { opacity: 1; }
+.bullet-row .x:hover { color: var(--red); background: hsl(0 0% 100% / 0.04); }
+.add-row { display: flex; gap: 8px; align-items: center; margin-top: 6px; font-size: 12px; color: var(--fg-muted); cursor: pointer; padding: 6px 2px; }
+.add-row:hover { color: var(--accent); }
+.add-row .plus { width: 18px; height: 18px; border-radius: 50%; border: 1px dashed var(--border-strong); display: grid; place-items: center; font-size: 14px; line-height: 1; }
+.add-row:hover .plus { border-color: var(--accent); }
+
+.fallback-box { margin-top: 18px; padding: 14px 16px; background: hsl(358 60% 12%); border: 1px solid hsl(358 60% 22%); border-radius: 10px; }
+.fallback-box .lbl { font-size: 10px; color: hsl(358 75% 72%); font-weight: 800; letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 6px; }
+
+.five-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 4px; }
+@media (max-width: 900px) { .five-grid { grid-template-columns: repeat(2, 1fr); } }
+.five-cell { background: var(--bg-elev-2); border: 1px solid var(--border); border-radius: 10px; padding: 14px; }
+.five-cell .k { font-size: 11px; font-weight: 800; color: var(--accent); text-transform: uppercase; letter-spacing: 0.14em; margin-bottom: 6px; }
+.five-cell .v { font-size: 12px; color: var(--fg); line-height: 1.45; }
+
+.role-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.role-row { display: grid; grid-template-columns: 140px 1fr; align-items: center; gap: 10px; padding: 8px 10px; background: var(--bg-elev-2); border: 1px solid var(--border); border-radius: 8px; }
+.role-row .k { font-size: 11px; font-weight: 700; color: var(--fg-muted); text-transform: uppercase; letter-spacing: 0.1em; }
+
+/* -------- Pitch / formation -------- */
+.pitch { position: relative; aspect-ratio: 68 / 105; background:
+  linear-gradient(to bottom, hsl(142 35% 20%), hsl(142 35% 16%));
+  border: 2px solid hsl(0 0% 100% / 0.5); border-radius: 8px; overflow: hidden;
+  background-image:
+    repeating-linear-gradient(to bottom, transparent 0 10%, hsl(0 0% 100% / 0.03) 10% 20%),
+    linear-gradient(to bottom, hsl(142 35% 20%), hsl(142 35% 16%));
+}
+.pitch .line { position: absolute; background: hsl(0 0% 100% / 0.5); }
+.pitch .halfway { left: 0; right: 0; top: 50%; height: 2px; }
+.pitch .circle { left: 50%; top: 50%; width: 25%; aspect-ratio: 1; border: 2px solid hsl(0 0% 100% / 0.5); border-radius: 50%; transform: translate(-50%, -50%); position: absolute; }
+.pitch .box-top { left: 22%; right: 22%; top: 0; height: 14%; border: 2px solid hsl(0 0% 100% / 0.5); border-top: none; position: absolute; }
+.pitch .box-bot { left: 22%; right: 22%; bottom: 0; height: 14%; border: 2px solid hsl(0 0% 100% / 0.5); border-bottom: none; position: absolute; }
+.pitch .gold-zone { position: absolute; top: 0; left: 28%; right: 28%; height: 22%; background: hsl(47 78% 56% / 0.12); border: 1px dashed hsl(47 78% 56% / 0.4); }
+
+.slot { position: absolute; transform: translate(-50%, -50%); width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center; cursor: pointer; transition: all .2s; }
+.slot .num { width: 42px; height: 42px; border-radius: 50%; background: var(--accent); color: var(--bg); font-weight: 900; font-size: 15px; display: grid; place-items: center; border: 2px solid hsl(48 100% 72%); box-shadow: 0 4px 12px hsl(0 0% 0% / 0.4); transition: all .2s; }
+.slot.empty .num { background: hsl(0 0% 100% / 0.08); color: var(--fg-muted); border-color: var(--border-strong); font-size: 11px; font-weight: 700; }
+.slot.is-drag-over .num { transform: scale(1.2); background: var(--accent-2); }
+.slot .lbl { position: absolute; bottom: -16px; left: 50%; transform: translateX(-50%); background: var(--bg); border: 1px solid var(--border); padding: 2px 6px; border-radius: 4px; font-size: 9px; font-weight: 700; color: var(--fg-muted); white-space: nowrap; letter-spacing: 0.06em; }
+.slot .name { position: absolute; top: 52px; left: 50%; transform: translateX(-50%); font-size: 10px; color: var(--fg); white-space: nowrap; font-weight: 600; background: hsl(0 0% 0% / 0.6); padding: 1px 5px; border-radius: 3px; }
+.slot:hover .num { transform: scale(1.08); }
+
+/* -------- Roster -------- */
+.roster { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 6px; }
+.rchip { display: flex; align-items: center; gap: 8px; padding: 6px 8px; background: var(--bg-elev-2); border: 1px solid var(--border); border-radius: 8px; cursor: grab; transition: all .15s; user-select: none; }
+.rchip:hover { border-color: var(--accent); }
+.rchip:active { cursor: grabbing; }
+.rchip.is-used { opacity: 0.35; }
+.rchip .n { width: 24px; height: 24px; border-radius: 50%; background: var(--accent); color: var(--bg); font-weight: 800; font-size: 11px; display: grid; place-items: center; flex-shrink: 0; }
+.rchip.is-used .n { background: var(--fg-dim); }
+.rchip .nm { font-size: 11px; font-weight: 600; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rchip .rl { font-size: 9px; color: var(--fg-muted); font-weight: 700; letter-spacing: 0.08em; }
+
+.roster-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 10px; }
+.roster-head h3 { font-size: 12px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: var(--fg); }
+.roster-head .hint { font-size: 10px; color: var(--fg-muted); }
+
+/* -------- Variant B: Dense grid -------- */
+.grid-b { display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 16px; }
+.grid-b .col { display: flex; flex-direction: column; gap: 16px; }
+.grid-b .card-head { padding: 12px 16px; }
+.grid-b .card-body { padding: 14px 16px; }
+.grid-b .card-head .lbl { font-size: 13px; }
+.grid-b .bullets { gap: 4px; }
+.grid-b .bullet-row { font-size: 12px; }
+.grid-b .ed, .grid-b .ed-ta { font-size: 12px; padding: 4px 6px; }
+@media (max-width: 1100px) { .grid-b { grid-template-columns: 1fr; } }
+
+.stacklist { display: flex; flex-direction: column; gap: 6px; }
+.stacklist .item { display: grid; grid-template-columns: auto 1fr; gap: 10px; padding: 8px 10px; background: var(--bg-elev-2); border-left: 2px solid var(--accent); border-radius: 0 6px 6px 0; font-size: 12px; }
+.stacklist .item .k { font-weight: 800; color: var(--accent); font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; white-space: nowrap; }
+.stacklist .item .v { color: var(--fg); line-height: 1.45; }
+
+/* -------- Tactic board (simple drag pucks) -------- */
+.board { position: relative; background: hsl(142 40% 22%); border: 2px solid hsl(0 0% 100% / 0.5); border-radius: 8px; aspect-ratio: 16 / 10; overflow: hidden;
+  background-image: repeating-linear-gradient(to right, hsl(142 40% 22%) 0 10%, hsl(142 40% 19%) 10% 20%);
+}
+.board .bline { position: absolute; background: hsl(0 0% 100% / 0.45); }
+.board .bmid { left: 50%; top: 0; bottom: 0; width: 2px; }
+.board .bcircle { left: 50%; top: 50%; width: 15%; aspect-ratio: 1; border: 2px solid hsl(0 0% 100% / 0.45); border-radius: 50%; transform: translate(-50%, -50%); position: absolute; }
+.board .bbox-l, .board .bbox-r { position: absolute; top: 50%; transform: translateY(-50%); width: 14%; height: 50%; border: 2px solid hsl(0 0% 100% / 0.45); }
+.board .bbox-l { left: 0; border-left: none; }
+.board .bbox-r { right: 0; border-right: none; }
+.puck { position: absolute; transform: translate(-50%, -50%); width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font-weight: 800; font-size: 12px; color: white; cursor: grab; user-select: none; box-shadow: 0 3px 8px hsl(0 0% 0% / 0.5); border: 2px solid hsl(0 0% 100% / 0.4); }
+.puck.us { background: hsl(47 78% 56%); color: hsl(215 30% 6%); border-color: hsl(48 100% 72%); }
+.puck.them { background: hsl(212 60% 48%); }
+.puck.ball { background: white; color: black; width: 18px; height: 18px; font-size: 11px; border-color: hsl(0 0% 90%); }
+.puck:active { cursor: grabbing; }
+.board-tools { display: flex; gap: 8px; margin-top: 10px; font-size: 11px; color: var(--fg-muted); }
+.board-tools button { padding: 5px 10px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg-elev-2); color: var(--fg); font-size: 11px; font-weight: 600; }
+.board-tools button:hover { border-color: var(--accent); color: var(--accent); }
+
+/* -------- Press trigger rows -------- */
+.trigger { display: grid; grid-template-columns: 1fr; gap: 4px; padding: 12px 14px; background: var(--bg-elev-2); border: 1px solid var(--border); border-radius: 10px; margin-bottom: 8px; }
+.trigger .t { font-size: 12px; font-weight: 700; color: var(--accent); display: flex; gap: 8px; align-items: baseline; }
+.trigger .t::before { content: "▸"; font-size: 11px; }
+.trigger .a { font-size: 12px; color: var(--fg); padding-left: 18px; line-height: 1.5; }
+
+/* utils */
+.muted { color: var(--fg-muted); }
+.pill { display: inline-flex; align-items: center; gap: 6px; padding: 3px 8px; border-radius: 12px; background: var(--bg-elev-2); border: 1px solid var(--border); font-size: 10px; font-weight: 700; color: var(--fg-muted); letter-spacing: 0.1em; text-transform: uppercase; }
+.pill.gold { color: var(--accent); border-color: hsl(47 78% 56% / 0.3); }
+
+.hint-inline { font-size: 11px; color: var(--fg-dim); margin-top: 6px; }
+
+/* Drag feedback */
+.rchip[draggable="true"] { touch-action: none; }
+
+/* ---------- Taktiska situationer ---------- */
+.sit-thumbs {
+  display: flex; flex-wrap: wrap; gap: 10px;
+  margin-top: 14px;
+}
+.sit-thumb {
+  all: unset;
+  cursor: pointer;
+  display: flex; flex-direction: column; gap: 6px;
+  width: 140px;
+  padding: 6px;
+  border: 1px solid hsl(0 0% 100% / 0.08);
+  border-radius: 8px;
+  background: hsl(0 0% 100% / 0.02);
+  transition: border-color 0.15s, transform 0.15s;
+  box-sizing: border-box;
+}
+.sit-thumb:hover {
+  border-color: hsl(47 78% 56% / 0.6);
+  transform: translateY(-1px);
+}
+.sit-thumb-svg {
+  aspect-ratio: 1 / 1;
+  border-radius: 4px;
+  overflow: hidden;
+  background: #0b1220;
+}
+.sit-thumb-title {
+  font-size: 11px;
+  color: var(--fg-dim);
+  line-height: 1.3;
+  text-align: center;
+}
+.sit-svg { display: block; width: 100%; height: 100%; }
+
+.sit-lightbox {
+  position: fixed; inset: 0;
+  background: rgba(8, 12, 22, 0.85);
+  backdrop-filter: blur(6px);
+  z-index: 1000;
+  display: flex; align-items: center; justify-content: center;
+  padding: 24px;
+}
+.sit-lightbox-inner {
+  position: relative;
+  background: #0b1220;
+  border: 1px solid hsl(47 78% 56% / 0.25);
+  border-radius: 12px;
+  padding: 24px 28px 20px;
+  max-width: min(92vw, 900px);
+  width: 100%;
+  max-height: 92vh;
+  overflow: auto;
+  box-sizing: border-box;
+}
+.sit-lightbox-close {
+  position: absolute; top: 10px; right: 14px;
+  background: none; border: none; color: var(--fg-dim);
+  font-size: 28px; line-height: 1; cursor: pointer;
+}
+.sit-lightbox-close:hover { color: var(--accent); }
+.sit-lightbox-title {
+  font-size: 18px; font-weight: 800; color: var(--fg);
+  margin-bottom: 4px;
+}
+.sit-lightbox-sub {
+  font-size: 13px; color: var(--fg-dim);
+  margin-bottom: 14px;
+}
+.sit-lightbox-svg {
+  aspect-ratio: 1 / 1;
+  max-width: 640px;
+  margin: 0 auto;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.sit-bench {
+  display: flex; flex-wrap: wrap; gap: 6px;
+  margin-top: 14px;
+  justify-content: center;
+}
+.sit-bench-pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 4px 10px;
+  background: hsl(211 78% 47% / 0.18);
+  border: 1px solid hsl(211 78% 47% / 0.5);
+  border-radius: 999px;
+  font-size: 12px;
+}
+.sit-bench-pill .n { color: #4aa3ff; font-weight: 800; }
+.sit-bench-pill .nm { color: var(--fg); }
+
+</style>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script>
+/* Data — trupp, formation, koherens */
+window.MP_DATA = {
+  match: {
+    opponent: "Lerum IS",
+    venue: "Aspevallen",
+    home: false,
+    kickoff: "I morgon · 19:00",
+    competition: "Seriematch",
+  },
+  formation433: {
+    // normerad 0–100 på grön plan (x=bredd, y=djup, 0 = vår MV)
+    positions: [
+      { id: "gk", label: "MV", x: 50, y: 8 },
+      { id: "lb", label: "VB", x: 15, y: 28 },
+      { id: "lcb", label: "VMB", x: 37, y: 22 },
+      { id: "rcb", label: "HMB", x: 63, y: 22 },
+      { id: "rb", label: "HB", x: 85, y: 28 },
+      { id: "dm", label: "CM-6", x: 50, y: 45 },
+      { id: "lcm", label: "CM-8", x: 32, y: 55 },
+      { id: "rcm", label: "CM-10", x: 68, y: 55 },
+      { id: "lw", label: "VY", x: 15, y: 78 },
+      { id: "st", label: "FW", x: 50, y: 82 },
+      { id: "rw", label: "HY", x: 85, y: 78 },
+    ],
+  },
+  roster: [
+    { n: 1, name: "Ali", role: "MV" },
+    { n: 2, name: "Daniel", role: "B" },
+    { n: 3, name: "Sabarr", role: "MB" },
+    { n: 4, name: "Ado", role: "MB" },
+    { n: 5, name: "Rayan", role: "B" },
+    { n: 6, name: "Ahmed", role: "CM" },
+    { n: 7, name: "Benji", role: "Y" },
+    { n: 8, name: "Galvan", role: "CM" },
+    { n: 9, name: "Leo", role: "FW" },
+    { n: 10, name: "Yosef", role: "CM" },
+    { n: 11, name: "Haris", role: "Y" },
+    { n: 12, name: "Meisam", role: "MV" },
+    { n: 13, name: "Pascal", role: "MB" },
+    { n: 14, name: "Måns", role: "CM" },
+    { n: 15, name: "Aldin", role: "Y" },
+    { n: 16, name: "Maric", role: "FW" },
+  ],
+  matchmal: [
+    "Dueller — vad betyder det att vinna en duell?",
+    "Andrabollsspel — attackera bollen direkt!",
+    "Tre poäng.",
+    "Samma ord från målvakt till anfallare.",
+    "Vinn våra 1-mot-1 i gyllene zonen.",
+  ],
+};
+
+/* Koherens-sektioner (redigerbara) */
+window.MP_COHERENCE = [
+  {
+    id: "forutsattningar",
+    num: "01",
+    title: "Förutsättningar",
+    eyebrow: "Kontext",
+    bullets: [
+      "Bra trupp. Svår bortamatch.",
+      "Lerum har kommit längre i sin resa — vi är underdogs.",
+      "Gör en bra insats. Utgången blir vad den blir.",
+    ],
+  },
+  {
+    id: "identitet",
+    num: "02",
+    title: "Identitet — och varför",
+    eyebrow: "Vem vi är",
+    subtitle: "Första 15 sätter tonen. Om det hackar: gå tillbaka hit.",
+    principles: ["Duellspel", "Andrabollsspel", "Springa i djupled"],
+    bullets: [
+      "Vi pressar högt och jagar åt samma håll.",
+      "Vi försvarar gyllene zonen — inget skott från mitten.",
+      "Vi spelar framåt så fort det är på — annars rör vi bollen tills det är på.",
+    ],
+    fallback: "Om det hackar: förenkla. Korta passningar. Vinn andrabollar. Bekväm press i mellanblock tills rytmen är tillbaka.",
+  },
+  {
+    id: "forsvar",
+    num: "03",
+    title: "Försvarsspel",
+    eyebrow: "När de har bollen",
+    principles: ["Tre korridorer", "Splitta planen", "Aldrig på insidan", "Aldrig i oss"],
+    bullets: [
+      "Hög press på målvaktens utspel — FW stänger lång bana, Y:na på backarna.",
+      "Mellanblock om de tar sig förbi — kompakt, jaga åt samma håll.",
+      "Lågt block i box: hybridförsvar. Zon i boxen + två strikt man.",
+    ],
+  },
+  {
+    id: "omst-anfall",
+    num: "04",
+    title: "Omställning → anfall",
+    eyebrow: "Vi vinner bollen",
+    principles: ["Kontra först", "Annars uppbyggnad", "Fyra alternativ"],
+  },
+  {
+    id: "anfall",
+    num: "05",
+    title: "Anfallsspel — den gyllene femman",
+    eyebrow: "Vi har bollen",
+    principles: ["Säkra kontringsläge", "Spela in", "Krossa ut", "Spring framåt", "Fyll på boxen"],
+    fivePoints: [
+      { k: "Spelbarhet", v: "Erbjud alltid fyra riktningar. Ingen får bli isolerad." },
+      { k: "Avstånd", v: "8–12 meter mellan närmaste två. Inte för nära, inte för långt." },
+      { k: "Bredd", v: "Yttre CB eller Y håller bredden — alltid någon på kanten." },
+      { k: "Djup", v: "FW hotar bakom backlinjen. Ingen backlinje i fred." },
+      { k: "Övertal", v: "I gyllene zonen — fem mot fyra, eller vi väntar." },
+    ],
+  },
+  {
+    id: "omst-forsvar",
+    num: "06",
+    title: "Omställning → försvar",
+    eyebrow: "Vi tappar bollen",
+    principles: ["Direkt bollåtererövring", "Indirekt bollåtererövring"],
+  },
+  {
+    id: "fasta-forsvar",
+    num: "07",
+    title: "Försvar mot fasta",
+    eyebrow: "Deras hörna / frispark",
+    principles: ["Fyra zoner", "Övriga markering", "Diagonal utgång vid kontring"],
+    note: "Adnan går igenom inför matchen. Frågor välkomna innan.",
+  },
+  {
+    id: "fasta-anfall",
+    num: "08",
+    title: "Anfall från fasta",
+    eyebrow: "Vår hörna / frispark",
+    note: "Adnan går igenom inför matchen. Frågor välkomna innan.",
+  },
+  {
+    id: "ovrigt",
+    num: "09",
+    title: "Övriga roller",
+    eyebrow: "Roller & ansvar",
+    roles: [
+      { k: "Kapten", v: "Ado" },
+      { k: "Straff", v: "Haris" },
+      { k: "Frispark — inlägg", v: "Galvan" },
+      { k: "Hörnor vänster", v: "Galvan" },
+      { k: "Hörnor höger", v: "Haris" },
+    ],
+  },
+];
+
+/* Press-triggers (egna kort) */
+window.MP_PRESS = [
+  { trigger: "Deras vänsterback har bollen", action: "HY pressar direkt, CM-10 dubblar, VY stänger spelvänd. Vaksam — de vill anfalla på sin högerkant med ojämn symmetri." },
+  { trigger: "Dålig första touch från deras CB", action: "FW pressar direkt, Y på backen, CM stänger mellan." },
+  { trigger: "Målvakten får bollen tillbaka", action: "FW stänger lång bana — tvinga kort. Y:na klättrar upp." },
+  { trigger: "Passning längs sidlinjen", action: "Y + B kliver mot — isolera vid linjen." },
+];
+
+/* Speluppbyggnad */
+window.MP_UPPBYGGNAD = [
+  { phase: "1", who: "Skapa säkerhet", what: "Hindra deras kontringsspel." },
+  { phase: "2", who: "Spela in centralt", what: "Centrera dem — flytta ur yttre korridorer." },
+  { phase: "3", who: "Spelvänd", what: "Ut till yttre korridor." },
+  { phase: "4", who: "Spring framåt", what: "Överlappande ytterbackar." },
+  { phase: "5", who: "Fyll på boxen", what: "Spelare i straffområdet." },
+];
+
+/* Taktiska situationer — platshållare per koherens-sektion */
+window.MP_SITUATIONS = {
+  "02-platshallare": {
+    sectionId: "identitet",
+    title: "Identitet — platshållare",
+    variant: "green",
+    players: [
+      { n: 1, x: 50, y: 92 },
+      { n: 2, x: 85, y: 72 },
+      { n: 3, x: 63, y: 78 },
+      { n: 4, x: 37, y: 78 },
+      { n: 5, x: 15, y: 72 },
+      { n: 6, x: 50, y: 55 },
+      { n: 8, x: 32, y: 45 },
+      { n: 10, x: 68, y: 45 },
+      { n: 7, x: 85, y: 22 },
+      { n: 9, x: 50, y: 18 },
+      { n: 11, x: 15, y: 22 },
+    ],
+    arrows: [],
+    zones: [],
+    ball: null,
+    bench: false,
+  },
+  "03-platshallare": {
+    sectionId: "forsvar",
+    title: "Hög press — platshållare",
+    variant: "green",
+    players: [
+      { n: 1, x: 50, y: 92 },
+      { n: 2, x: 85, y: 72 },
+      { n: 3, x: 63, y: 78 },
+      { n: 4, x: 37, y: 78 },
+      { n: 5, x: 15, y: 72 },
+      { n: 6, x: 50, y: 55 },
+      { n: 8, x: 32, y: 45 },
+      { n: 10, x: 68, y: 45 },
+      { n: 7, x: 85, y: 22, highlight: true },
+      { n: 9, x: 50, y: 18, highlight: true },
+      { n: 11, x: 15, y: 22, highlight: true },
+    ],
+    arrows: [
+      { from: [50, 18], to: [50, 8], style: "dashed", color: "gold" },
+    ],
+    zones: [
+      { x: 25, y: 6, w: 50, h: 20, fill: "greenHighlight" },
+    ],
+    ball: { x: 50, y: 8 },
+    bench: false,
+  },
+  "03-press-vb": {
+    sectionId: "forsvar",
+    title: "Press på deras vänsterback",
+    subtitle: "Primär press-trigger — HY pressar, CM-10 dubblar.",
+    variant: "green",
+    players: [
+      { n: 1, x: 50, y: 92 },
+      { n: 2, x: 85, y: 70 },
+      { n: 3, x: 63, y: 78 },
+      { n: 4, x: 37, y: 78 },
+      { n: 5, x: 15, y: 72 },
+      { n: 6, x: 50, y: 50 },
+      { n: 8, x: 30, y: 40 },
+      { n: 10, x: 65, y: 35, highlight: true },
+      { n: 7, x: 82, y: 20, highlight: true },
+      { n: 9, x: 50, y: 18 },
+      { n: 11, x: 18, y: 22 },
+    ],
+    arrows: [
+      { from: [82, 20], to: [90, 14], style: "solid", color: "gold" },
+      { from: [65, 35], to: [82, 22], style: "dashed", color: "gold" },
+      { from: [18, 22], to: [45, 20], style: "dashed", color: "gold" },
+    ],
+    zones: [],
+    ball: { x: 92, y: 12 },
+    bench: false,
+  },
+  "04-platshallare": {
+    sectionId: "omst-anfall",
+    title: "Kontra i mitten — platshållare",
+    variant: "green",
+    players: [
+      { n: 1, x: 50, y: 92 },
+      { n: 2, x: 85, y: 72 },
+      { n: 3, x: 63, y: 78 },
+      { n: 4, x: 37, y: 78 },
+      { n: 5, x: 15, y: 72 },
+      { n: 6, x: 50, y: 55, highlight: true },
+      { n: 8, x: 32, y: 45 },
+      { n: 10, x: 68, y: 45 },
+      { n: 7, x: 85, y: 22 },
+      { n: 9, x: 50, y: 18 },
+      { n: 11, x: 15, y: 22 },
+    ],
+    arrows: [
+      { from: [50, 55], to: [50, 22], style: "solid", color: "gold" },
+    ],
+    zones: [],
+    ball: { x: 50, y: 55 },
+    bench: false,
+  },
+  "05-platshallare": {
+    sectionId: "anfall",
+    title: "Spela in i gyllene zonen — platshållare",
+    variant: "green",
+    players: [
+      { n: 1, x: 50, y: 92 },
+      { n: 2, x: 85, y: 60 },
+      { n: 3, x: 63, y: 70 },
+      { n: 4, x: 37, y: 70 },
+      { n: 5, x: 15, y: 60 },
+      { n: 6, x: 50, y: 50 },
+      { n: 8, x: 32, y: 38 },
+      { n: 10, x: 68, y: 38 },
+      { n: 7, x: 85, y: 18 },
+      { n: 9, x: 50, y: 14, highlight: true },
+      { n: 11, x: 15, y: 18 },
+    ],
+    arrows: [
+      { from: [32, 38], to: [50, 14], style: "solid", color: "gold" },
+    ],
+    zones: [
+      { x: 25, y: 6, w: 50, h: 18, fill: "greenHighlight" },
+    ],
+    ball: { x: 32, y: 38 },
+    bench: false,
+  },
+  "06-platshallare": {
+    sectionId: "omst-forsvar",
+    title: "Direkt motpress — platshållare",
+    variant: "green",
+    players: [
+      { n: 1, x: 50, y: 92 },
+      { n: 2, x: 85, y: 72 },
+      { n: 3, x: 63, y: 78 },
+      { n: 4, x: 37, y: 78 },
+      { n: 5, x: 15, y: 72 },
+      { n: 6, x: 50, y: 55, highlight: true },
+      { n: 8, x: 32, y: 45, highlight: true },
+      { n: 10, x: 68, y: 45, highlight: true },
+      { n: 7, x: 85, y: 22 },
+      { n: 9, x: 50, y: 18 },
+      { n: 11, x: 15, y: 22 },
+    ],
+    arrows: [
+      { from: [32, 45], to: [50, 50], style: "dashed", color: "gold" },
+      { from: [68, 45], to: [50, 50], style: "dashed", color: "gold" },
+      { from: [50, 55], to: [50, 50], style: "dashed", color: "gold" },
+    ],
+    zones: [],
+    ball: { x: 50, y: 50 },
+    bench: false,
+  },
+  "07-platshallare": {
+    sectionId: "fasta-forsvar",
+    title: "Deras hörna — platshållare",
+    variant: "green",
+    players: [
+      { n: 1, x: 50, y: 4 },
+      { n: 2, x: 28, y: 10 },
+      { n: 3, x: 40, y: 6 },
+      { n: 4, x: 50, y: 8 },
+      { n: 5, x: 60, y: 6 },
+      { n: 6, x: 72, y: 10 },
+      { n: 7, x: 35, y: 16 },
+      { n: 8, x: 50, y: 18, highlight: true },
+      { n: 10, x: 65, y: 16, highlight: true },
+      { n: 9, x: 50, y: 30 },
+      { n: 11, x: 50, y: 55 },
+    ],
+    arrows: [],
+    zones: [
+      { x: 30, y: 2, w: 40, h: 18, fill: "greenHighlight" },
+    ],
+    ball: { x: 2, y: 2 },
+    bench: false,
+  },
+  "08-platshallare": {
+    sectionId: "fasta-anfall",
+    title: "Vår hörna — platshållare",
+    variant: "green",
+    players: [
+      { n: 1, x: 50, y: 92 },
+      { n: 2, x: 35, y: 50 },
+      { n: 3, x: 40, y: 14 },
+      { n: 4, x: 50, y: 12 },
+      { n: 5, x: 60, y: 14 },
+      { n: 6, x: 70, y: 16 },
+      { n: 7, x: 50, y: 22 },
+      { n: 8, x: 30, y: 22 },
+      { n: 9, x: 30, y: 10 },
+      { n: 10, x: 50, y: 40 },
+      { n: 11, x: 2, y: 2, highlight: true },
+    ],
+    arrows: [
+      { from: [2, 2], to: [50, 12], style: "solid", color: "gold" },
+    ],
+    zones: [],
+    ball: { x: 2, y: 2 },
+    bench: false,
+  },
+};
+
+</script>
+</head>
+<body>
+<template id="__bundler_thumbnail" data-bg-color="#0b1220">
+  <svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+    <rect width="1200" height="800" fill="#0b1220"/>
+    <rect x="420" y="120" width="360" height="560" rx="12" fill="#1a2740" stroke="#eac54f" stroke-width="3"/>
+    <line x1="420" y1="400" x2="780" y2="400" stroke="#ffffff80" stroke-width="2"/>
+    <circle cx="600" cy="400" r="60" fill="none" stroke="#ffffff80" stroke-width="2"/>
+    <rect x="480" y="120" width="240" height="90" fill="#eac54f33" stroke="#eac54f80" stroke-width="2"/>
+    <circle cx="600" cy="165" r="18" fill="#eac54f"/>
+    <circle cx="510" cy="290" r="14" fill="#eac54f"/>
+    <circle cx="690" cy="290" r="14" fill="#eac54f"/>
+    <circle cx="600" cy="460" r="14" fill="#eac54f"/>
+    <circle cx="510" cy="540" r="14" fill="#eac54f"/>
+    <circle cx="690" cy="540" r="14" fill="#eac54f"/>
+    <text x="600" y="740" text-anchor="middle" fill="#eac54f" font-family="system-ui" font-weight="900" font-size="42" letter-spacing="4">MATCHPLAN</text>
+  </svg>
+</template>
+<div id="root"></div>
+<script type="text/babel" data-presets="react">
+// Matchplan — React components
+const { useState, useRef, useEffect } = React;
+
+/* ---------- Shared helpers ---------- */
+function Eyebrow({ children, mono }) {
+  return <div className={mono ? "eyebrow-mono" : "eyebrow"}>{children}</div>;
+}
+
+function EditableLine({ value, onChange, placeholder, small }) {
+  return (
+    <input
+      className={"ed " + (small ? "ed-small" : "")}
+      value={value}
+      placeholder={placeholder}
+      onChange={e => onChange(e.target.value)}
+    />
+  );
+}
+
+function EditableText({ value, onChange, placeholder }) {
+  const ref = useRef(null);
+  useEffect(() => {
+    if (!ref.current) return;
+    ref.current.style.height = "auto";
+    ref.current.style.height = ref.current.scrollHeight + "px";
+  }, [value]);
+  return (
+    <textarea
+      ref={ref}
+      className="ed-ta"
+      value={value}
+      placeholder={placeholder}
+      onChange={e => onChange(e.target.value)}
+    />
+  );
+}
+
+/* ---------- Principles (read-only pill chips) ---------- */
+function Principles({ items }) {
+  if (!items || !items.length) return null;
+  return (
+    <div className="principles-row">
+      {items.map((p, i) => (
+        <span key={i} className="principle-chip">{p}</span>
+      ))}
+    </div>
+  );
+}
+
+/* ---------- Bullets list ---------- */
+function Bullets({ items, onChange }) {
+  const add = () => onChange([...items, ""]);
+  const edit = (i, v) => onChange(items.map((it, idx) => idx === i ? v : it));
+  const remove = (i) => onChange(items.filter((_, idx) => idx !== i));
+  return (
+    <div className="bullets">
+      {items.map((it, i) => (
+        <div key={i} className="bullet-row">
+          <div className="dot" />
+          <EditableText value={it} onChange={v => edit(i, v)} placeholder="Lägg till rad..." />
+          <button className="x" onClick={() => remove(i)} title="Ta bort">✕</button>
+        </div>
+      ))}
+      <div className="add-row" onClick={add}>
+        <span className="plus">+</span> Lägg till rad
+      </div>
+    </div>
+  );
+}
+
+/* ---------- Pitch with drag-drop slots ---------- */
+function Pitch({ assignments, onAssign, onClear, roster }) {
+  const [dragOver, setDragOver] = useState(null);
+  return (
+    <div className="pitch">
+      <div className="gold-zone" />
+      <div className="line halfway" />
+      <div className="circle" />
+      <div className="box-top" />
+      <div className="box-bot" />
+      {MP_DATA.formation433.positions.map(pos => {
+        const num = assignments[pos.id];
+        const player = roster.find(p => p.n === num);
+        const isOver = dragOver === pos.id;
+        const empty = !num;
+        return (
+          <div
+            key={pos.id}
+            className={"slot " + (empty ? "empty " : "") + (isOver ? "is-drag-over" : "")}
+            style={{ left: `${pos.x}%`, top: `${100 - pos.y}%` }}
+            onDragOver={e => { e.preventDefault(); setDragOver(pos.id); }}
+            onDragLeave={() => setDragOver(null)}
+            onDrop={e => {
+              e.preventDefault();
+              const n = parseInt(e.dataTransfer.getData("text/plain"), 10);
+              if (!isNaN(n)) onAssign(pos.id, n);
+              setDragOver(null);
+            }}
+            onClick={() => { if (num) onClear(pos.id); }}
+            title={player ? `Klicka för att ta bort ${player.name}` : "Dra spelare hit"}
+          >
+            <div className="num">{num || pos.label}</div>
+            <div className="lbl">{pos.label}</div>
+            {player && <div className="name">{player.name}</div>}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+/* ---------- Roster (draggable chips) ---------- */
+function Roster({ roster, setRoster, used }) {
+  return (
+    <div>
+      <div className="roster-head">
+        <h3>Trupp (16)</h3>
+        <span className="hint">Dra till planen →</span>
+      </div>
+      <div className="roster">
+        {roster.map((p, i) => (
+          <div
+            key={p.n}
+            className={"rchip " + (used.has(p.n) ? "is-used" : "")}
+            draggable
+            onDragStart={e => e.dataTransfer.setData("text/plain", String(p.n))}
+          >
+            <div className="n">{p.n}</div>
+            <input
+              className="nm"
+              value={p.name}
+              onChange={e => setRoster(roster.map((x, idx) => idx === i ? { ...x, name: e.target.value } : x))}
+            />
+            <div className="rl">{p.role}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ---------- Tactic board with draggable pucks ---------- */
+function TacticBoard() {
+  const initial = [
+    ...[1,2,3,4,5,6,7,8,9,10,11].map((n, i) => ({
+      id: "u"+n, kind: "us", label: n,
+      x: 15 + (i % 4) * 8, y: 20 + Math.floor(i / 4) * 20
+    })),
+    ...[1,2,3,4,5,6,7,8,9,10,11].map((n, i) => ({
+      id: "t"+n, kind: "them", label: n,
+      x: 60 + (i % 4) * 8, y: 20 + Math.floor(i / 4) * 20
+    })),
+    { id: "ball", kind: "ball", label: "", x: 50, y: 50 },
+  ];
+  const [pucks, setPucks] = useState(initial);
+  const boardRef = useRef(null);
+
+  const startDrag = (e, id) => {
+    e.preventDefault();
+    const board = boardRef.current.getBoundingClientRect();
+    const move = (ev) => {
+      const cx = (ev.touches ? ev.touches[0].clientX : ev.clientX);
+      const cy = (ev.touches ? ev.touches[0].clientY : ev.clientY);
+      const x = Math.max(2, Math.min(98, ((cx - board.left) / board.width) * 100));
+      const y = Math.max(2, Math.min(98, ((cy - board.top) / board.height) * 100));
+      setPucks(ps => ps.map(p => p.id === id ? { ...p, x, y } : p));
+    };
+    const up = () => {
+      window.removeEventListener("mousemove", move);
+      window.removeEventListener("mouseup", up);
+      window.removeEventListener("touchmove", move);
+      window.removeEventListener("touchend", up);
+    };
+    window.addEventListener("mousemove", move);
+    window.addEventListener("mouseup", up);
+    window.addEventListener("touchmove", move);
+    window.addEventListener("touchend", up);
+  };
+
+  return (
+    <div>
+      <div className="board" ref={boardRef}>
+        <div className="bline bmid" />
+        <div className="bcircle" />
+        <div className="bbox-l" />
+        <div className="bbox-r" />
+        {pucks.map(p => (
+          <div
+            key={p.id}
+            className={"puck " + p.kind}
+            style={{ left: p.x + "%", top: p.y + "%" }}
+            onMouseDown={e => startDrag(e, p.id)}
+            onTouchStart={e => startDrag(e, p.id)}
+          >
+            {p.label}
+          </div>
+        ))}
+      </div>
+      <div className="board-tools">
+        <button onClick={() => setPucks(initial)}>Återställ</button>
+        <span className="muted" style={{alignSelf:"center", fontSize:11}}>Dra pjäser för att rita upp spelet</span>
+      </div>
+    </div>
+  );
+}
+
+/* ---------- Situation SVG (taktikdiagram) ---------- */
+function SituationPitch({ variant, focusHalf }) {
+  if (variant === "blackout") {
+    const focus = focusHalf || "right";
+    const leftFill = focus === "left" ? "#266b2a" : "#1b1b1b";
+    const rightFill = focus === "right" ? "#266b2a" : "#1b1b1b";
+    return (
+      <g>
+        <rect x="0" y="0" width="50" height="100" fill={leftFill} />
+        <rect x="50" y="0" width="50" height="100" fill={rightFill} />
+        <line x1="0" y1="50" x2="100" y2="50" stroke="#fff" strokeWidth="0.3" />
+        <rect x="30" y="0" width="40" height="14" fill="none" stroke="#fff" strokeWidth="0.3" />
+        <rect x="30" y="86" width="40" height="14" fill="none" stroke="#fff" strokeWidth="0.3" />
+        <circle cx="50" cy="50" r="8" fill="none" stroke="#fff" strokeWidth="0.3" />
+      </g>
+    );
+  }
+  const stripes = [];
+  for (let i = 0; i < 10; i++) {
+    stripes.push(<rect key={i} x="0" y={i * 10} width="100" height="10" fill={i % 2 === 0 ? "#266b2a" : "#215e24"} />);
+  }
+  return (
+    <g>
+      {stripes}
+      <rect x="0" y="0" width="100" height="100" fill="none" stroke="#fff" strokeWidth="0.3" />
+      <line x1="0" y1="50" x2="100" y2="50" stroke="#fff" strokeWidth="0.3" />
+      <circle cx="50" cy="50" r="8" fill="none" stroke="#fff" strokeWidth="0.3" />
+      <rect x="30" y="0" width="40" height="14" fill="none" stroke="#fff" strokeWidth="0.3" />
+      <rect x="30" y="86" width="40" height="14" fill="none" stroke="#fff" strokeWidth="0.3" />
+      <rect x="40" y="0" width="20" height="5" fill="none" stroke="#fff" strokeWidth="0.3" />
+      <rect x="40" y="95" width="20" height="5" fill="none" stroke="#fff" strokeWidth="0.3" />
+    </g>
+  );
+}
+
+function SituationSVG({ situation, roster, thumb }) {
+  if (!situation) return null;
+  const s = situation;
+  const textSize = thumb ? 4 : 3.2;
+  const labelSize = thumb ? 3 : 2.4;
+  const playerR = thumb ? 3.6 : 3;
+  const markerId = "sit-arrow-" + (thumb ? "t" : "b");
+
+  return (
+    <svg className={"sit-svg " + (thumb ? "is-thumb" : "")} viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet">
+      <defs>
+        <marker id={markerId} viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="#eac54f" />
+        </marker>
+      </defs>
+      <SituationPitch variant={s.variant || "green"} focusHalf={s.focusHalf} />
+      {(s.zones || []).map((z, i) => (
+        <rect key={"z" + i} x={z.x} y={z.y} width={z.w} height={z.h}
+          fill="hsl(84 54% 45% / 0.22)" stroke="#eac54f" strokeWidth="0.3" strokeDasharray="1 0.8" />
+      ))}
+      {(s.arrows || []).map((a, i) => (
+        <line key={"a" + i} x1={a.from[0]} y1={a.from[1]} x2={a.to[0]} y2={a.to[1]}
+          stroke="#eac54f" strokeWidth="0.7"
+          strokeDasharray={a.style === "dashed" ? "1.5 1" : undefined}
+          markerEnd={"url(#" + markerId + ")"} />
+      ))}
+      {(s.players || []).map((pl, i) => {
+        const r = roster.find(x => x.n === pl.n);
+        return (
+          <g key={"p" + i} transform={`translate(${pl.x} ${pl.y})`}>
+            <circle r={playerR} fill={pl.highlight ? "#eac54f" : "#c9302c"} stroke="#fff" strokeWidth="0.4" />
+            <text y={textSize * 0.35} fontSize={textSize} textAnchor="middle" fill={pl.highlight ? "#0b1220" : "#fff"} fontWeight="800">{pl.n}</text>
+            {!thumb && r && (
+              <g transform={`translate(0 ${playerR + 2})`}>
+                <rect x={-7} y={-1.6} width={14} height={3.2} rx="0.6" fill="rgba(11,18,32,0.85)" />
+                <text y={0.9} fontSize={labelSize} textAnchor="middle" fill="#fff" fontWeight="700">{r.name}</text>
+              </g>
+            )}
+          </g>
+        );
+      })}
+      {s.ball && (
+        <circle cx={s.ball.x} cy={s.ball.y} r={thumb ? 1.4 : 1} fill="#fff" stroke="#0b1220" strokeWidth="0.3" />
+      )}
+    </svg>
+  );
+}
+
+/* ---------- Situation Thumbs (filtrerad rad per sektion) ---------- */
+function SituationThumbs({ sectionId, situations, roster, onOpen }) {
+  if (!situations) return null;
+  const entries = Object.entries(situations).filter(([, s]) => s.sectionId === sectionId);
+  if (!entries.length) return null;
+  return (
+    <div className="sit-thumbs">
+      {entries.map(([key, s]) => (
+        <button key={key} className="sit-thumb" onClick={() => onOpen(s)} title={s.title} type="button">
+          <div className="sit-thumb-svg">
+            <SituationSVG situation={s} roster={roster} thumb />
+          </div>
+          <div className="sit-thumb-title">{s.title}</div>
+        </button>
+      ))}
+    </div>
+  );
+}
+
+/* ---------- Situation Lightbox (fullskärm) ---------- */
+function SituationBench({ roster }) {
+  const bench = roster.filter(p => p.n >= 12);
+  if (!bench.length) return null;
+  return (
+    <div className="sit-bench">
+      {bench.map(p => (
+        <div key={p.n} className="sit-bench-pill">
+          <span className="n">{p.n}</span>
+          <span className="nm">{p.name}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function SituationLightbox({ situation, roster, onClose }) {
+  useEffect(() => {
+    if (!situation) return;
+    const onKey = (e) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [situation, onClose]);
+  if (!situation) return null;
+  return (
+    <div className="sit-lightbox" onClick={onClose}>
+      <div className="sit-lightbox-inner" onClick={e => e.stopPropagation()}>
+        <button className="sit-lightbox-close" onClick={onClose} aria-label="Stäng" type="button">×</button>
+        <div className="sit-lightbox-title">{situation.title}</div>
+        {situation.subtitle && <div className="sit-lightbox-sub">{situation.subtitle}</div>}
+        <div className="sit-lightbox-svg">
+          <SituationSVG situation={situation} roster={roster} />
+        </div>
+        {situation.bench && <SituationBench roster={roster} />}
+      </div>
+    </div>
+  );
+}
+
+Object.assign(window, { Eyebrow, EditableLine, EditableText, Principles, Bullets, Pitch, Roster, TacticBoard, SituationSVG, SituationPitch, SituationThumbs, SituationLightbox, SituationBench });
+
+</script>
+<script type="text/babel" data-presets="react">
+// Matchplan — sections (koherens 1–9 + press + uppbyggnad)
+const { useState: useStateS } = React;
+
+function SectionCard({ num, eyebrow, title, subtitle, children, dense, sectionId, onOpen, roster }) {
+  return (
+    <div className={"section-card " + (dense ? "dense" : "")}>
+      <div className="sec-head">
+        <span className="section-num">{num}</span>
+        <Eyebrow>{eyebrow}</Eyebrow>
+      </div>
+      <h2 className="section-h">{title}</h2>
+      {subtitle && <div className="sec-sub">{subtitle}</div>}
+      <div className="sec-body">{children}</div>
+      {sectionId && onOpen && (
+        <SituationThumbs sectionId={sectionId} situations={window.MP_SITUATIONS} roster={roster} onOpen={onOpen} />
+      )}
+    </div>
+  );
+}
+
+/* 01 Förutsättningar */
+function SecForutsattningar({ state, set, onOpen, roster }) {
+  return (
+    <SectionCard num="01" eyebrow="Kontext" title="Förutsättningar"
+      sectionId="forutsattningar" onOpen={onOpen} roster={roster}>
+      <Bullets items={state} onChange={set} />
+    </SectionCard>
+  );
+}
+
+/* 02 Identitet */
+function SecIdentitet({ onOpen, roster }) {
+  return (
+    <SectionCard num="02" eyebrow="Vem vi är" title="Identitet"
+      sectionId="identitet" onOpen={onOpen} roster={roster}>
+      <Principles items={MP_COHERENCE[1].principles} />
+    </SectionCard>
+  );
+}
+
+/* 03 Försvarsspel */
+function SecForsvar({ onOpen, roster }) {
+  return (
+    <SectionCard num="03" eyebrow="När de har bollen" title="Försvarsspel"
+      sectionId="forsvar" onOpen={onOpen} roster={roster}>
+      <Principles items={MP_COHERENCE[2].principles} />
+    </SectionCard>
+  );
+}
+
+/* 04 Omställning → anfall */
+function SecOmstAnfall({ onOpen, roster }) {
+  return (
+    <SectionCard num="04" eyebrow="Vi vinner bollen" title="Omställning → anfall"
+      sectionId="omst-anfall" onOpen={onOpen} roster={roster}>
+      <Principles items={MP_COHERENCE[3].principles} />
+    </SectionCard>
+  );
+}
+
+/* 05 Anfallsspel */
+function SecAnfall({ onOpen, roster }) {
+  return (
+    <SectionCard num="05" eyebrow="Vi har bollen" title="Anfallsspel"
+      sectionId="anfall" onOpen={onOpen} roster={roster}>
+      <Principles items={MP_COHERENCE[4].principles} />
+    </SectionCard>
+  );
+}
+
+/* 06 Omställning → försvar */
+function SecOmstForsvar({ onOpen, roster }) {
+  return (
+    <SectionCard num="06" eyebrow="Vi tappar bollen" title="Omställning → försvar"
+      sectionId="omst-forsvar" onOpen={onOpen} roster={roster}>
+      <Principles items={MP_COHERENCE[5].principles} />
+    </SectionCard>
+  );
+}
+
+/* 07 Fasta — försvar */
+function SecFastaForsvar({ onOpen, roster }) {
+  return (
+    <SectionCard num="07" eyebrow="Deras hörna / frispark" title="Försvar mot fasta"
+      sectionId="fasta-forsvar" onOpen={onOpen} roster={roster}>
+      <Principles items={MP_COHERENCE[6].principles} />
+      <div className="sec-note">{MP_COHERENCE[6].note}</div>
+    </SectionCard>
+  );
+}
+
+/* 08 Fasta — anfall */
+function SecFastaAnfall({ onOpen, roster }) {
+  return (
+    <SectionCard num="08" eyebrow="Vår hörna / frispark" title="Anfall från fasta"
+      sectionId="fasta-anfall" onOpen={onOpen} roster={roster}>
+      <div className="sec-note">{MP_COHERENCE[7].note}</div>
+    </SectionCard>
+  );
+}
+
+/* 09 Övriga roller */
+function SecOvrigt({ state, set, onOpen, roster }) {
+  return (
+    <SectionCard num="09" eyebrow="Roller & ansvar" title="Övriga roller"
+      sectionId="ovrigt" onOpen={onOpen} roster={roster}>
+      <div className="role-grid">
+        {state.map((r, i) => (
+          <div key={i} className="role-row">
+            <div className="k">{r.k}</div>
+            <EditableLine small value={r.v}
+              onChange={v => set(state.map((x, idx) => idx === i ? { ...x, v } : x))} />
+          </div>
+        ))}
+      </div>
+    </SectionCard>
+  );
+}
+
+/* Press triggers (side panel) */
+function PressPanel({ state, set }) {
+  const add = () => set([...state, { trigger: "", action: "" }]);
+  return (
+    <div className="card">
+      <div className="card-head"><span className="num">TRG</span><span className="lbl">Press-triggers</span></div>
+      <div className="card-body">
+        {state.map((t, i) => (
+          <div key={i} className="trigger">
+            <EditableText value={t.trigger} onChange={v => set(state.map((x, idx) => idx === i ? { ...x, trigger: v } : x))} placeholder="Trigger..." />
+            <EditableText value={t.action} onChange={v => set(state.map((x, idx) => idx === i ? { ...x, action: v } : x))} placeholder="Vad vi gör..." />
+          </div>
+        ))}
+        <div className="add-row" onClick={add}><span className="plus">+</span> Lägg till trigger</div>
+      </div>
+    </div>
+  );
+}
+
+/* Uppbyggnad */
+function UppbyggnadPanel({ state, set }) {
+  return (
+    <div className="card">
+      <div className="card-head"><span className="num">SPU</span><span className="lbl">Speluppbyggnad</span></div>
+      <div className="card-body">
+        <div className="stacklist">
+          {state.map((r, i) => (
+            <div key={i} className="item">
+              <div className="k">{r.phase}</div>
+              <div className="v">
+                <div style={{fontWeight:700, color:"var(--fg)", marginBottom:2}}>{r.who}</div>
+                <EditableText value={r.what} onChange={v => set(state.map((x, idx) => idx === i ? { ...x, what: v } : x))} />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* Matchmål */
+function MatchmalPanel({ state, set }) {
+  return (
+    <div className="card">
+      <div className="card-head"><span className="num">MÅL</span><span className="lbl">Nyckelpunkter & matchmål</span></div>
+      <div className="card-body">
+        <Bullets items={state} onChange={set} />
+      </div>
+    </div>
+  );
+}
+
+Object.assign(window, {
+  SectionCard, SecForutsattningar, SecIdentitet, SecForsvar, SecOmstAnfall,
+  SecAnfall, SecOmstForsvar, SecFastaForsvar, SecFastaAnfall, SecOvrigt,
+  PressPanel, UppbyggnadPanel, MatchmalPanel
+});
+
+</script>
+<script type="text/babel" data-presets="react">
+// Matchplan — main App (Variant A: Flow, Variant B: Grid)
+const { useState: useStateA, useMemo } = React;
+
+function App() {
+  const [variant, setVariant] = useStateA("A");
+
+  // State for editable bits
+  const [roster, setRoster] = useStateA(MP_DATA.roster);
+  const [assignments, setAssignments] = useStateA({}); // pos.id -> player.n
+
+  const [matchmal, setMatchmal] = useStateA(MP_DATA.matchmal);
+  const [forutsattningar, setForutsattningar] = useStateA(MP_COHERENCE[0].bullets);
+  const [roles, setRoles] = useStateA(MP_COHERENCE[8].roles);
+  const [press, setPress] = useStateA(MP_PRESS);
+  const [uppbyggnad, setUppbyggnad] = useStateA(MP_UPPBYGGNAD);
+  const [activeSituation, setActiveSituation] = useStateA(null);
+
+  const used = useMemo(() => new Set(Object.values(assignments)), [assignments]);
+  const assign = (posId, num) => setAssignments(prev => {
+    // remove num from any other pos first
+    const next = {};
+    for (const [k, v] of Object.entries(prev)) if (v !== num) next[k] = v;
+    next[posId] = num;
+    return next;
+  });
+  const clear = (posId) => setAssignments(prev => {
+    const next = { ...prev }; delete next[posId]; return next;
+  });
+
+  const m = MP_DATA.match;
+
+  return (
+    <>
+      <div className="app-bg" aria-hidden="true" />
+      <header className="topbar">
+        <div className="topbar-inner">
+          <div className="brand">
+            <div className="brand-badge">G</div>
+            <div className="brand-name">Matchplaner<span className="yr">2026</span></div>
+          </div>
+          <div className="match-meta">
+            <div>
+              <div className="vs">{m.home ? "Hemma" : "Borta"} · Matchplan</div>
+              <h1>Gunnilse IS <span className="muted" style={{fontWeight:500}}>vs</span> <span className="opp">{m.opponent}</span></h1>
+              <div className="dots">
+                <span>{m.kickoff}</span>
+                <span>{m.venue}</span>
+                <span>4-3-3</span>
+              </div>
+            </div>
+          </div>
+          <div className="variant-toggle">
+            <button className={variant === "A" ? "is-active" : ""} onClick={() => setVariant("A")}>Flöde</button>
+            <button className={variant === "B" ? "is-active" : ""} onClick={() => setVariant("B")}>Matchblad</button>
+          </div>
+        </div>
+      </header>
+
+      <main className="page">
+        {variant === "A" ? (
+          <VariantA
+            {...{ roster, setRoster, assignments, assign, clear, used,
+              matchmal, setMatchmal, forutsattningar, setForutsattningar,
+              roles, setRoles, press, setPress, uppbyggnad, setUppbyggnad,
+              onOpen: setActiveSituation }}
+          />
+        ) : (
+          <VariantB
+            {...{ roster, setRoster, assignments, assign, clear, used,
+              matchmal, setMatchmal, forutsattningar, setForutsattningar,
+              roles, setRoles, press, setPress, uppbyggnad, setUppbyggnad,
+              onOpen: setActiveSituation }}
+          />
+        )}
+      </main>
+      <SituationLightbox situation={activeSituation} roster={roster} onClose={() => setActiveSituation(null)} />
+    </>
+  );
+}
+
+function VariantA(p) {
+  return (
+    <div className="flow">
+      <div className="flow-main">
+        <SecForutsattningar state={p.forutsattningar} set={p.setForutsattningar} onOpen={p.onOpen} roster={p.roster} />
+        <SecIdentitet onOpen={p.onOpen} roster={p.roster} />
+        <SecForsvar onOpen={p.onOpen} roster={p.roster} />
+        <SecOmstAnfall onOpen={p.onOpen} roster={p.roster} />
+        <SecAnfall onOpen={p.onOpen} roster={p.roster} />
+        <SecOmstForsvar onOpen={p.onOpen} roster={p.roster} />
+        <SecFastaForsvar onOpen={p.onOpen} roster={p.roster} />
+        <SecFastaAnfall onOpen={p.onOpen} roster={p.roster} />
+        <SecOvrigt state={p.roles} set={p.setRoles} onOpen={p.onOpen} roster={p.roster} />
+      </div>
+      <aside className="flow-side">
+        <div className="card">
+          <div className="card-head"><span className="num">XI</span><span className="lbl">Startelva — 4-3-3</span></div>
+          <div className="card-body">
+            <Pitch assignments={p.assignments} onAssign={p.assign} onClear={p.clear} roster={p.roster} />
+            <div className="hint-inline">Dra spelare från truppen → klicka på en cirkel för att ta bort.</div>
+          </div>
+        </div>
+        <div className="card">
+          <div className="card-body"><Roster roster={p.roster} setRoster={p.setRoster} used={p.used} /></div>
+        </div>
+        <MatchmalPanel state={p.matchmal} set={p.setMatchmal} />
+        <PressPanel state={p.press} set={p.setPress} />
+        <UppbyggnadPanel state={p.uppbyggnad} set={p.setUppbyggnad} />
+        <div className="card">
+          <div className="card-head"><span className="num">TAK</span><span className="lbl">Taktiktavla</span></div>
+          <div className="card-body"><TacticBoard /></div>
+        </div>
+      </aside>
+    </div>
+  );
+}
+
+function VariantB(p) {
+  return (
+    <div className="grid-b">
+      <div className="col">
+        <div className="card">
+          <div className="card-head"><span className="num">XI</span><span className="lbl">Startelva — 4-3-3</span></div>
+          <div className="card-body">
+            <Pitch assignments={p.assignments} onAssign={p.assign} onClear={p.clear} roster={p.roster} />
+          </div>
+        </div>
+        <div className="card">
+          <div className="card-body"><Roster roster={p.roster} setRoster={p.setRoster} used={p.used} /></div>
+        </div>
+        <div className="card">
+          <div className="card-head"><span className="num">TAK</span><span className="lbl">Taktiktavla</span></div>
+          <div className="card-body"><TacticBoard /></div>
+        </div>
+      </div>
+      <div className="col">
+        <MatchmalPanel state={p.matchmal} set={p.setMatchmal} />
+        <CompactCard num="01" title="Förutsättningar" sectionId="forutsattningar" onOpen={p.onOpen} roster={p.roster}>
+          <Bullets items={p.forutsattningar} onChange={p.setForutsattningar} />
+        </CompactCard>
+        <CompactCard num="02" title="Identitet" sectionId="identitet" onOpen={p.onOpen} roster={p.roster}>
+          <Principles items={MP_COHERENCE[1].principles} />
+        </CompactCard>
+        <CompactCard num="03" title="Försvarsspel" sectionId="forsvar" onOpen={p.onOpen} roster={p.roster}>
+          <Principles items={MP_COHERENCE[2].principles} />
+        </CompactCard>
+        <CompactCard num="05" title="Anfallsspel" sectionId="anfall" onOpen={p.onOpen} roster={p.roster}>
+          <Principles items={MP_COHERENCE[4].principles} />
+        </CompactCard>
+      </div>
+      <div className="col">
+        <CompactCard num="04" title="Omst → anfall" sectionId="omst-anfall" onOpen={p.onOpen} roster={p.roster}>
+          <Principles items={MP_COHERENCE[3].principles} />
+        </CompactCard>
+        <CompactCard num="06" title="Omst → försvar" sectionId="omst-forsvar" onOpen={p.onOpen} roster={p.roster}>
+          <Principles items={MP_COHERENCE[5].principles} />
+        </CompactCard>
+        <CompactCard num="07" title="Fasta — försvar" sectionId="fasta-forsvar" onOpen={p.onOpen} roster={p.roster}>
+          <Principles items={MP_COHERENCE[6].principles} />
+          <div className="sec-note">{MP_COHERENCE[6].note}</div>
+        </CompactCard>
+        <CompactCard num="08" title="Fasta — anfall" sectionId="fasta-anfall" onOpen={p.onOpen} roster={p.roster}>
+          <div className="sec-note">{MP_COHERENCE[7].note}</div>
+        </CompactCard>
+        <PressPanel state={p.press} set={p.setPress} />
+        <UppbyggnadPanel state={p.uppbyggnad} set={p.setUppbyggnad} />
+        <CompactCard num="09" title="Övriga roller" sectionId="ovrigt" onOpen={p.onOpen} roster={p.roster}>
+          <div style={{display:"flex", flexDirection:"column", gap:6}}>
+            {p.roles.map((r, i) => (
+              <div key={i} className="role-row">
+                <div className="k">{r.k}</div>
+                <EditableLine small value={r.v}
+                  onChange={v => p.setRoles(p.roles.map((x, idx) => idx === i ? { ...x, v } : x))} />
+              </div>
+            ))}
+          </div>
+        </CompactCard>
+      </div>
+    </div>
+  );
+}
+
+function CompactCard({ num, title, children, sectionId, onOpen, roster }) {
+  return (
+    <div className="card">
+      <div className="card-head"><span className="num">{num}</span><span className="lbl">{title}</span></div>
+      <div className="card-body">
+        {children}
+        {sectionId && onOpen && (
+          <SituationThumbs sectionId={sectionId} situations={window.MP_SITUATIONS} roster={roster} onOpen={onOpen} />
+        )}
+      </div>
+    </div>
+  );
+}
+
+Object.assign(window, { App, VariantA, VariantB, CompactCard });
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+
+</script>
+</body>
+</html>
