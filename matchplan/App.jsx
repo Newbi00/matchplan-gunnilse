@@ -14,6 +14,7 @@ function App() {
   const [press, setPress] = useStateA(MP_PRESS);
   const [uppbyggnad, setUppbyggnad] = useStateA(MP_UPPBYGGNAD);
   const [activeSituation, setActiveSituation] = useStateA(null);
+  const [tacticBoardOpen, setTacticBoardOpen] = useStateA(false);
 
   const used = useMemo(() => new Set(Object.values(assignments)), [assignments]);
   const assign = (posId, num) => setAssignments(prev => {
@@ -62,18 +63,26 @@ function App() {
             {...{ roster, setRoster, assignments, assign, clear, used,
               matchmal, setMatchmal, forutsattningar, setForutsattningar,
               roles, setRoles, press, setPress, uppbyggnad, setUppbyggnad,
-              onOpen: setActiveSituation }}
+              onOpen: setActiveSituation,
+              onOpenTacticBoard: () => setTacticBoardOpen(true) }}
           />
         ) : (
           <VariantB
             {...{ roster, setRoster, assignments, assign, clear, used,
               matchmal, setMatchmal, forutsattningar, setForutsattningar,
               roles, setRoles, press, setPress, uppbyggnad, setUppbyggnad,
-              onOpen: setActiveSituation }}
+              onOpen: setActiveSituation,
+              onOpenTacticBoard: () => setTacticBoardOpen(true) }}
           />
         )}
       </main>
       <SituationLightbox situation={activeSituation} roster={roster} onClose={() => setActiveSituation(null)} />
+      <TacticBoardLightbox
+        open={tacticBoardOpen}
+        onClose={() => setTacticBoardOpen(false)}
+        roster={roster}
+        assignments={assignments}
+      />
     </>
   );
 }
@@ -101,15 +110,15 @@ function VariantA(p) {
           </div>
         </div>
         <div className="card">
+          <div className="card-head"><span className="num">TAK</span><span className="lbl">Taktiktavla</span></div>
+          <div className="card-body"><TacticBoard onOpen={p.onOpenTacticBoard} /></div>
+        </div>
+        <div className="card">
           <div className="card-body"><Roster roster={p.roster} setRoster={p.setRoster} used={p.used} /></div>
         </div>
         <MatchmalPanel state={p.matchmal} set={p.setMatchmal} />
         <PressPanel state={p.press} set={p.setPress} />
         <UppbyggnadPanel state={p.uppbyggnad} set={p.setUppbyggnad} />
-        <div className="card">
-          <div className="card-head"><span className="num">TAK</span><span className="lbl">Taktiktavla</span></div>
-          <div className="card-body"><TacticBoard /></div>
-        </div>
       </aside>
     </div>
   );
@@ -126,11 +135,11 @@ function VariantB(p) {
           </div>
         </div>
         <div className="card">
-          <div className="card-body"><Roster roster={p.roster} setRoster={p.setRoster} used={p.used} /></div>
+          <div className="card-head"><span className="num">TAK</span><span className="lbl">Taktiktavla</span></div>
+          <div className="card-body"><TacticBoard onOpen={p.onOpenTacticBoard} /></div>
         </div>
         <div className="card">
-          <div className="card-head"><span className="num">TAK</span><span className="lbl">Taktiktavla</span></div>
-          <div className="card-body"><TacticBoard /></div>
+          <div className="card-body"><Roster roster={p.roster} setRoster={p.setRoster} used={p.used} /></div>
         </div>
       </div>
       <div className="col">

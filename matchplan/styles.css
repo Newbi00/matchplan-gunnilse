@@ -299,3 +299,128 @@ textarea { resize: vertical; }
 }
 .sit-bench-pill .n { color: #4aa3ff; font-weight: 800; }
 .sit-bench-pill .nm { color: var(--fg); }
+
+/* ---------- Taktiktavla (V1) ---------- */
+.tb-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.tb-preview-hint {
+  font-size: 11px;
+  color: var(--fg-dim);
+  line-height: 1.4;
+}
+.tb-preview-btn {
+  background: var(--accent);
+  color: #111;
+  font-weight: 800;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+}
+.tb-preview-btn:hover {
+  background: var(--accent-2);
+}
+.tb-lightbox {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.tb-lightbox-inner {
+  background: #0b1220;
+  border: 2px solid var(--accent);
+  border-radius: 12px;
+  max-width: 1200px;
+  width: 100%;
+  max-height: 95vh;
+  padding: 20px;
+  overflow: auto;
+  position: relative;
+}
+.tb-lightbox-close {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  background: transparent;
+  border: 1px solid hsl(0 0% 100% / 0.25);
+  color: #fff;
+  font-size: 20px;
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  cursor: pointer;
+  line-height: 1;
+}
+.tb-lightbox-close:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.tb-lightbox-title {
+  font-size: 18px;
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 14px;
+  padding-right: 44px;
+}
+.tb-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  touch-action: none;
+  user-select: none;
+  max-height: 80vh;
+  background: #0b1220;
+  border-radius: 8px;
+}
+.tb-puck {
+  cursor: grab;
+}
+.tb-puck:active {
+  cursor: grabbing;
+}
+.tb-toolbar {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 14px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid hsl(0 0% 100% / 0.12);
+}
+.tb-tool-btn {
+  background: #2a3852;
+  color: #fff;
+  border: 1px solid hsl(0 0% 100% / 0.12);
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.tb-tool-btn:hover {
+  border-color: var(--accent);
+}
+.tb-tool-btn.is-active {
+  background: var(--accent);
+  color: #111;
+  border-color: var(--accent-2);
+}
+.tb-svg.is-arrow-mode .tb-puck {
+  pointer-events: none;
+  cursor: default;
+}
+.tb-arrow {
+  pointer-events: none;
+}
+.tb-arrow-preview {
+  pointer-events: none;
+}
