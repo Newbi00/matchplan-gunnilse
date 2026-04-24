@@ -22,6 +22,21 @@ window.MP_DATA = {
       { id: "st", label: "FW", x: 50, y: 82 },
       { id: "rw", label: "HY", x: 85, y: 78 },
     ],
+    // Default-startelva — tidig på vänstersida (Galvan CM-8 + Benji VY + Rayan VB).
+    // Haris på HY för straff/hörnor H. Ado kapten som HMB. Ali MV.
+    startingXI: {
+      gk: 1,    // Ali
+      lb: 5,    // Rayan
+      lcb: 3,   // Sabarr
+      rcb: 4,   // Ado (kapten)
+      rb: 2,    // Daniel
+      dm: 6,    // Ahmed (CM-6)
+      lcm: 8,   // Galvan (CM-8, vänsterfotad — tar hörnor V)
+      rcm: 10,  // Yosef (CM-10)
+      lw: 7,    // Benji (VY)
+      st: 9,    // Leo (FW)
+      rw: 11,   // Haris (HY — straff, hörnor H)
+    },
   },
   roster: [
     { n: 1, name: "Ali", role: "MV" },
@@ -42,11 +57,9 @@ window.MP_DATA = {
     { n: 16, name: "Maric", role: "FW" },
   ],
   matchmal: [
-    "Dueller — vad betyder det att vinna en duell?",
-    "Andrabollsspel — attackera bollen direkt!",
-    "Tre poäng.",
-    "Samma ord från målvakt till anfallare.",
-    "Vinn våra 1-mot-1 i gyllene zonen.",
+    "Duellspel.",
+    "Avstånd mellan linjerna.",
+    "Vi vill inte ha Lerum i oss!",
   ],
 };
 
@@ -150,9 +163,6 @@ window.MP_COHERENCE = [
 /* Press-triggers (egna kort) */
 window.MP_PRESS = [
   { trigger: "Deras vänsterback har bollen", action: "HY pressar direkt, CM-10 dubblar, VY stänger spelvänd. Vaksam — de vill anfalla på sin högerkant med ojämn symmetri." },
-  { trigger: "Dålig första touch från deras CB", action: "FW pressar direkt, Y på backen, CM stänger mellan." },
-  { trigger: "Målvakten får bollen tillbaka", action: "FW stänger lång bana — tvinga kort. Y:na klättrar upp." },
-  { trigger: "Passning längs sidlinjen", action: "Y + B kliver mot — isolera vid linjen." },
 ];
 
 /* Speluppbyggnad */

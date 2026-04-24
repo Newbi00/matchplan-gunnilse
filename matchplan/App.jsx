@@ -6,7 +6,7 @@ function App() {
 
   // State for editable bits
   const [roster, setRoster] = useStateA(MP_DATA.roster);
-  const [assignments, setAssignments] = useStateA({}); // pos.id -> player.n
+  const [assignments, setAssignments] = useStateA(MP_DATA.formation433.startingXI || {}); // pos.id -> player.n
 
   const [matchmal, setMatchmal] = useStateA(MP_DATA.matchmal);
   const [forutsattningar, setForutsattningar] = useStateA(MP_COHERENCE[0].bullets);
