@@ -238,8 +238,127 @@ function Spelytor() {
 }
 
 /* ---------- Stubs som fylls på i senare tasks ---------- */
-function TaktikHalv() { return null; }
-function TaktikBilderThumbs() { return null; }
+/* Översätter en dot till en visningsetikett.
+ * team:"us" + n:N → slå upp i MP_DATA.roster, visa nummer som default (eller initialer / nummer+namn
+ *   styrs av labelMode-parametern).
+ * team:"them" eller saknar n → använd dot.label direkt. */
+function _taktikLabelFor(dot, roster, labelMode) {
+  if (dot.team !== "us" || dot.n == null) {
+    return dot.label != null ? String(dot.label) : "";
+  }
+  const player = roster && roster.find(p => p.n === dot.n);
+  if (!player) return String(dot.n);
+  if (labelMode === "initials") {
+    const parts = (player.name || "").trim().split(/\s+/);
+    const first = parts[0] ? parts[0][0].toUpperCase() : "";
+    const second = parts[1] ? parts[1][0].toUpperCase() : "";
+    return (first + second) || String(dot.n);
+  }
+  if (labelMode === "numberName") {
+    const first = (player.name || "").trim().split(/\s+/)[0] || "";
+    return first ? `${dot.n} ${first}` : String(dot.n);
+  }
+  return String(dot.n);
+}
+
+/* TaktikHalv — stående halvplan, ritar zones + pilar + spelare från meter-koord.
+ * Props:
+ *  - id: string (unikt per instans för defs)
+ *  - title: string (rubrikband)
+ *  - dots, arrows, zones: från MP_TAKTIK-posten
+ *  - roster: MP_DATA.roster-arrayen (för namn-uppslag)
+ *  - labelMode: "number" | "initials" | "numberName" (default "number") */
+function TaktikHalv({ id, title, dots, arrows, zones, roster, labelMode }) {
+  const V = window.MP_HALF_VB;
+  const mode = labelMode || "number";
+  return (
+    <svg viewBox={`0 0 ${V.width} ${V.height}`} xmlns="http://www.w3.org/2000/svg" style={TK_SVG_STYLE}>
+      <_TaktikPitchDefs id={id} />
+      <rect width={V.width} height={V.height} fill={`url(#tk-mow-${id})`} />
+      {zones && zones.map((z, i) => {
+        const tl = window.halfM(z.xMax, z.yMin);
+        const br = window.halfM(z.xMin, z.yMax);
+        const cx = (tl.x + br.x) / 2;
+        const cy = (tl.y + br.y) / 2;
+        return (
+          <g key={`z-${i}`}>
+            <rect x={tl.x} y={tl.y} width={br.x - tl.x} height={br.y - tl.y}
+                  fill={z.fill} stroke={z.stroke || "none"} strokeWidth="1.5" strokeDasharray="5 4" />
+            {z.label && (
+              <text x={cx} y={cy} textAnchor="middle" dominantBaseline="central"
+                    fontFamily="Inter, sans-serif" fontWeight="800" fontSize="12"
+                    fill={z.labelColor || TK_COLORS.white} letterSpacing="1">{z.label}</text>
+            )}
+          </g>
+        );
+      })}
+      <_TaktikHalfLines />
+      {arrows && arrows.map((a, i) => {
+        const f = window.halfM(a.from.xM, a.from.yM);
+        const t = window.halfM(a.to.xM,   a.to.yM);
+        const color = a.kind === "ball" ? TK_COLORS.white : a.kind === "pass" ? "hsl(50 95% 60%)" : TK_COLORS.gold;
+        const marker = a.kind === "ball" ? `url(#tk-arrW-${id})` : `url(#tk-arrG-${id})`;
+        const dash = a.kind === "run" ? "8 5" : a.kind === "pass" ? "10 4" : null;
+        if (a.curve) {
+          const mx = (f.x + t.x) / 2;
+          const my = (f.y + t.y) / 2;
+          const dx = t.x - f.x, dy = t.y - f.y;
+          const len = Math.hypot(dx, dy) || 1;
+          const ox = -dy / len * a.curve;
+          const oy =  dx / len * a.curve;
+          return (
+            <path key={`a-${i}`} d={`M ${f.x} ${f.y} Q ${mx + ox} ${my + oy} ${t.x} ${t.y}`}
+                  fill="none" stroke={color} strokeWidth="3" strokeLinecap="round"
+                  strokeDasharray={dash || undefined} markerEnd={marker} />
+          );
+        }
+        return (
+          <line key={`a-${i}`} x1={f.x} y1={f.y} x2={t.x} y2={t.y}
+                stroke={color} strokeWidth="3" strokeLinecap="round"
+                strokeDasharray={dash || undefined} markerEnd={marker} />
+        );
+      })}
+      {dots && dots.map((d, i) => {
+        const p = window.halfM(d.xM, d.yM);
+        return (
+          <_TaktikDot key={d.id || `d-${i}`} x={p.x} y={p.y} r={d.r}
+            label={_taktikLabelFor(d, roster, mode)} team={d.team || "us"} />
+        );
+      })}
+      {title && (
+        <g>
+          <rect x={V.width / 2 - 170} y={V.height - 54} width={340} height={34} rx="3" fill={TK_COLORS.panelBg} />
+          <text x={V.width / 2} y={V.height - 32} textAnchor="middle"
+                fontFamily="Inter, sans-serif" fontWeight="900" fontSize="16" fill={TK_COLORS.gold} letterSpacing="1.8">
+            {title.toUpperCase()}
+          </text>
+        </g>
+      )}
+    </svg>
+  );
+}
+
+/* TaktikBilderThumbs — renderar alla MP_TAKTIK-poster vars sectionId matchar
+ * som små klickbara mini-SVG:er. Klick → onOpen(taktikKey). */
+function TaktikBilderThumbs({ sectionId, taktik, roster, onOpen }) {
+  const keys = Object.keys(taktik || {}).filter(k => taktik[k].sectionId === sectionId);
+  if (keys.length === 0) return null;
+  return (
+    <div className="tk-thumbs-grid">
+      {keys.map(k => {
+        const t = taktik[k];
+        return (
+          <button key={k} type="button" className="tk-thumb" onClick={() => onOpen(k)}
+            title={`Öppna ${t.title}`}>
+            <TaktikHalv id={`thumb-${k}`} title={t.title} dots={t.dots}
+              arrows={t.arrows} zones={t.zones} roster={roster} labelMode="number" />
+            <div className="tk-thumb-caption">{t.title}</div>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
 function TaktikLightbox() { return null; }
 
 Object.assign(window, {

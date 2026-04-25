@@ -82,10 +82,12 @@ function SecOmstForsvar({ onOpen, roster }) {
 }
 
 /* 07 Fasta — försvar */
-function SecFastaForsvar({ onOpen, roster }) {
+function SecFastaForsvar({ onOpen, onOpenTaktik, roster }) {
   return (
     <SectionCard num="07" eyebrow="Deras hörna / frispark" title="Försvar mot fasta"
       sectionId="fasta-forsvar" onOpen={onOpen} roster={roster}>
+      <TaktikBilderThumbs sectionId="fasta-forsvar" taktik={window.MP_TAKTIK}
+        roster={roster} onOpen={onOpenTaktik} />
       <Principles items={MP_COHERENCE[6].principles} />
       <div className="sec-note">{MP_COHERENCE[6].note}</div>
     </SectionCard>
@@ -93,10 +95,12 @@ function SecFastaForsvar({ onOpen, roster }) {
 }
 
 /* 08 Fasta — anfall */
-function SecFastaAnfall({ onOpen, roster }) {
+function SecFastaAnfall({ onOpen, onOpenTaktik, roster }) {
   return (
     <SectionCard num="08" eyebrow="Vår hörna / frispark" title="Anfall från fasta"
       sectionId="fasta-anfall" onOpen={onOpen} roster={roster}>
+      <TaktikBilderThumbs sectionId="fasta-anfall" taktik={window.MP_TAKTIK}
+        roster={roster} onOpen={onOpenTaktik} />
       <div className="sec-note">{MP_COHERENCE[7].note}</div>
     </SectionCard>
   );

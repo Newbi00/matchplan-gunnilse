@@ -433,3 +433,32 @@ textarea { resize: vertical; }
   background: #0b1220;
 }
 .ref-image svg { display: block; }
+/* Taktikbilder — thumbs-raden */
+.tk-thumbs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
+  margin: 12px 0 4px;
+}
+.tk-thumb {
+  display: block;
+  width: 100%;
+  padding: 0;
+  background: #0b1220;
+  border: 1px solid var(--border, rgba(255,255,255,0.08));
+  border-radius: 10px;
+  overflow: hidden;
+  cursor: pointer;
+  color: var(--fg, #eaeaea);
+  text-align: left;
+  transition: border-color 120ms ease, transform 120ms ease;
+}
+.tk-thumb:hover { border-color: var(--accent, #eac54f); transform: translateY(-1px); }
+.tk-thumb svg { display: block; width: 100%; height: auto; }
+.tk-thumb-caption {
+  padding: 6px 10px 8px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: var(--fg, #eaeaea);
+}

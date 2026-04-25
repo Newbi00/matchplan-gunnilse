@@ -15,6 +15,7 @@ function App() {
   const [uppbyggnad, setUppbyggnad] = useStateA(MP_UPPBYGGNAD);
   const [activeSituation, setActiveSituation] = useStateA(null);
   const [tacticBoardOpen, setTacticBoardOpen] = useStateA(false);
+  const [taktikOpen, setTaktikOpen] = useStateA(null); // taktikKey eller null
 
   const used = useMemo(() => new Set(Object.values(assignments)), [assignments]);
   const assign = (posId, num) => setAssignments(prev => {
@@ -64,7 +65,8 @@ function App() {
               matchmal, setMatchmal, forutsattningar, setForutsattningar,
               roles, setRoles, press, setPress, uppbyggnad, setUppbyggnad,
               onOpen: setActiveSituation,
-              onOpenTacticBoard: () => setTacticBoardOpen(true) }}
+              onOpenTacticBoard: () => setTacticBoardOpen(true),
+              onOpenTaktik: setTaktikOpen }}
           />
         ) : (
           <VariantB
@@ -72,7 +74,8 @@ function App() {
               matchmal, setMatchmal, forutsattningar, setForutsattningar,
               roles, setRoles, press, setPress, uppbyggnad, setUppbyggnad,
               onOpen: setActiveSituation,
-              onOpenTacticBoard: () => setTacticBoardOpen(true) }}
+              onOpenTacticBoard: () => setTacticBoardOpen(true),
+              onOpenTaktik: setTaktikOpen }}
           />
         )}
       </main>
@@ -97,8 +100,8 @@ function VariantA(p) {
         <SecOmstAnfall onOpen={p.onOpen} roster={p.roster} />
         <SecAnfall onOpen={p.onOpen} roster={p.roster} />
         <SecOmstForsvar onOpen={p.onOpen} roster={p.roster} />
-        <SecFastaForsvar onOpen={p.onOpen} roster={p.roster} />
-        <SecFastaAnfall onOpen={p.onOpen} roster={p.roster} />
+        <SecFastaForsvar onOpen={p.onOpen} onOpenTaktik={p.onOpenTaktik} roster={p.roster} />
+        <SecFastaAnfall onOpen={p.onOpen} onOpenTaktik={p.onOpenTaktik} roster={p.roster} />
         <SecOvrigt state={p.roles} set={p.setRoles} onOpen={p.onOpen} roster={p.roster} />
       </div>
       <aside className="flow-side">
