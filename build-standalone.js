@@ -10,8 +10,10 @@ const read = (f) => fs.readFileSync(path.join(src, f), 'utf8');
 
 let html = read('index.html');
 const css = read('styles.css');
+const pitchGeo = read('pitchGeometry.js');
 const data = read('data.js');
 const components = read('Components.jsx');
+const taktikBilder = read('TaktikBilder.jsx');
 const sections = read('Sections.jsx');
 const app = read('App.jsx');
 
@@ -20,12 +22,20 @@ html = html.replace(
   `<style>\n${css}\n</style>`
 );
 html = html.replace(
+  /<script src="pitchGeometry\.js"><\/script>/,
+  `<script>\n${pitchGeo}\n</script>`
+);
+html = html.replace(
   /<script src="data\.js"><\/script>/,
   `<script>\n${data}\n</script>`
 );
 html = html.replace(
   /<script type="text\/babel" src="Components\.jsx"><\/script>/,
   `<script type="text/babel" data-presets="react">\n${components}\n</script>`
+);
+html = html.replace(
+  /<script type="text\/babel" src="TaktikBilder\.jsx"><\/script>/,
+  `<script type="text/babel" data-presets="react">\n${taktikBilder}\n</script>`
 );
 html = html.replace(
   /<script type="text\/babel" src="Sections\.jsx"><\/script>/,
