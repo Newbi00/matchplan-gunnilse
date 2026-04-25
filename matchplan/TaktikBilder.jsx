@@ -364,6 +364,9 @@ function TaktikLightbox({ taktikKey, roster, onClose }) {
   const svgRef = useRef(null);
   const [dots, setDots] = useState(() => t ? t.dots.map(d => ({ ...d })) : []);
   const [dragId, setDragId] = useState(null);
+  const [toolMode, setToolMode] = useState("move"); // "move" | "arrow"
+  const [userArrows, setUserArrows] = useState([]);  // { from:{xM,yM}, to:{xM,yM} }
+  const [arrowDraft, setArrowDraft] = useState(null); // { from:{xM,yM}, to:{xM,yM} } under drag
 
   // Escape-stäng
   useEffect(() => {
@@ -374,9 +377,12 @@ function TaktikLightbox({ taktikKey, roster, onClose }) {
   }, [t, onClose]);
 
   // Reset-funktion — återställ till default
-  const resetDots = () => {
+  const resetAll = () => {
     if (!t) return;
     setDots(t.dots.map(d => ({ ...d })));
+    setUserArrows([]);
+    setArrowDraft(null);
+    setToolMode("move");
   };
 
   // Hjälpare: konvertera skärm-pixel till SVG-koord
@@ -419,6 +425,51 @@ function TaktikLightbox({ taktikKey, roster, onClose }) {
     setDragId(null);
   };
 
+  // Skärm-punkt till meter-koord (djup, bredd)
+  const screenToMeters = (clientX, clientY) => {
+    const svgPt = screenToSvg(clientX, clientY);
+    if (!svgPt) return null;
+    const scale = window.MP_HALF_VB.scale;
+    const yM = Math.max(0, Math.min(68, svgPt.x / scale));
+    const xM = Math.max(52.5, Math.min(105, 105 - svgPt.y / scale));
+    return { xM, yM };
+  };
+
+  // Pil-drag: onPointerDown på SVG-bakgrund
+  const onArrowStart = (e) => {
+    if (toolMode !== "arrow") return;
+    if (e.target !== svgRef.current && e.target.tagName !== "rect") return;
+    // bakgrunden är första <rect>; om event-target är en dot hoppar vi ur (dot-handlers har stopPropagation)
+    const m = screenToMeters(e.clientX, e.clientY);
+    if (!m) return;
+    try { svgRef.current.setPointerCapture(e.pointerId); } catch (_) {}
+    setArrowDraft({ from: m, to: m });
+  };
+
+  const onArrowMove = (e) => {
+    if (toolMode !== "arrow" || !arrowDraft) return;
+    const m = screenToMeters(e.clientX, e.clientY);
+    if (!m) return;
+    setArrowDraft({ from: arrowDraft.from, to: m });
+  };
+
+  const onArrowEnd = (e) => {
+    if (toolMode !== "arrow" || !arrowDraft) return;
+    try { svgRef.current.releasePointerCapture(e.pointerId); } catch (_) {}
+    // Minsta avstånd för att registrera (undvik oavsiktliga klick-pilar)
+    const dx = arrowDraft.to.xM - arrowDraft.from.xM;
+    const dy = arrowDraft.to.yM - arrowDraft.from.yM;
+    if (Math.hypot(dx, dy) > 1.5) {
+      setUserArrows(prev => [...prev, arrowDraft]);
+    }
+    setArrowDraft(null);
+  };
+
+  const clearUserArrows = () => {
+    setUserArrows([]);
+    setArrowDraft(null);
+  };
+
   if (!t) return null;
 
   const V = window.MP_HALF_VB;
@@ -429,16 +480,22 @@ function TaktikLightbox({ taktikKey, roster, onClose }) {
       <div className="tk-lightbox-inner" onClick={e => e.stopPropagation()}>
         <button className="tk-close-btn" onClick={onClose} type="button" aria-label="Stäng">×</button>
         <div className="tk-toolbar">
-          <button className="tk-tool-btn" type="button" onClick={resetDots}>Återställ</button>
+          <button className={`tk-tool-btn${toolMode === "move" ? " is-active" : ""}`} type="button"
+                  onClick={() => setToolMode("move")}>Flytta</button>
+          <button className={`tk-tool-btn${toolMode === "arrow" ? " is-active" : ""}`} type="button"
+                  onClick={() => setToolMode("arrow")}>Rita pil</button>
+          <button className="tk-tool-btn" type="button" onClick={clearUserArrows}>Rensa pilar</button>
+          <button className="tk-tool-btn" type="button" onClick={resetAll}>Återställ</button>
         </div>
         <div className="tk-svg-wrap">
           <svg ref={svgRef}
                viewBox={`0 0 ${V.width} ${V.height}`}
                xmlns="http://www.w3.org/2000/svg"
-               style={TK_SVG_STYLE}
-               onPointerMove={onPointerMove}
-               onPointerUp={onPointerUp}
-               onPointerCancel={onPointerUp}>
+               style={{ ...TK_SVG_STYLE, touchAction: "none" }}
+               onPointerDown={onArrowStart}
+               onPointerMove={(e) => { onPointerMove(e); onArrowMove(e); }}
+               onPointerUp={(e) => { onPointerUp(e); onArrowEnd(e); }}
+               onPointerCancel={(e) => { onPointerUp(e); onArrowEnd(e); }}>
             <_TaktikPitchDefs id={lbId} />
             <rect width={V.width} height={V.height} fill={`url(#tk-mow-${lbId})`} />
             {t.zones && t.zones.map((z, i) => {
@@ -484,6 +541,24 @@ function TaktikLightbox({ taktikKey, roster, onClose }) {
                       strokeDasharray={dash || undefined} markerEnd={marker} />
               );
             })}
+            {userArrows.map((a, i) => {
+              const f = window.halfM(a.from.xM, a.from.yM);
+              const tp = window.halfM(a.to.xM, a.to.yM);
+              return (
+                <line key={`ua-${i}`} x1={f.x} y1={f.y} x2={tp.x} y2={tp.y}
+                      stroke={TK_COLORS.gold} strokeWidth="3" strokeLinecap="round"
+                      markerEnd={`url(#tk-arrG-${lbId})`} />
+              );
+            })}
+            {arrowDraft && (() => {
+              const f = window.halfM(arrowDraft.from.xM, arrowDraft.from.yM);
+              const tp = window.halfM(arrowDraft.to.xM, arrowDraft.to.yM);
+              return (
+                <line x1={f.x} y1={f.y} x2={tp.x} y2={tp.y}
+                      stroke={TK_COLORS.goldBright} strokeWidth="2" strokeLinecap="round"
+                      strokeDasharray="6 4" opacity="0.8" />
+              );
+            })()}
             {dots.map((d, i) => {
               const p = window.halfM(d.xM, d.yM);
               const r = d.r != null ? d.r : 20;
@@ -495,7 +570,7 @@ function TaktikLightbox({ taktikKey, roster, onClose }) {
               return (
                 <g key={d.id || `d-${i}`}
                    style={{ cursor: "grab", touchAction: "none" }}
-                   onPointerDown={onPointerDown(d.id)}>
+                   onPointerDown={toolMode === "move" ? onPointerDown(d.id) : undefined}>
                   <circle cx={p.x} cy={p.y} r={r} fill={fill} stroke={stroke} strokeWidth="2" />
                   <text x={p.x} y={p.y} textAnchor="middle" dominantBaseline="central"
                         fontFamily="Inter, sans-serif" fontWeight="900" fontSize={fs} fill={color}
