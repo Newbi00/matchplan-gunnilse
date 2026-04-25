@@ -359,7 +359,34 @@ function TaktikBilderThumbs({ sectionId, taktik, roster, onOpen }) {
     </div>
   );
 }
-function TaktikLightbox() { return null; }
+/* TaktikLightbox — fullscreen-view av en taktikbild med möjlighet att stänga
+ * via ×, Escape eller klick-utanför. Interaktivitet (drag, pilar, återställ)
+ * kommer i Task 7–8. */
+function TaktikLightbox({ taktikKey, roster, onClose }) {
+  const t = window.MP_TAKTIK && window.MP_TAKTIK[taktikKey];
+
+  // Escape → stäng
+  useEffect(() => {
+    if (!t) return;
+    const handler = e => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [t, onClose]);
+
+  if (!t) return null;
+
+  return (
+    <div className="tk-lightbox" onClick={onClose}>
+      <div className="tk-lightbox-inner" onClick={e => e.stopPropagation()}>
+        <button className="tk-close-btn" onClick={onClose} type="button" aria-label="Stäng">×</button>
+        <div className="tk-svg-wrap">
+          <TaktikHalv id={`lb-${taktikKey}`} title={t.title} dots={t.dots}
+            arrows={t.arrows} zones={t.zones} roster={roster} labelMode="number" />
+        </div>
+      </div>
+    </div>
+  );
+}
 
 Object.assign(window, {
   ZonerBox, Korridorer, Spelytor,

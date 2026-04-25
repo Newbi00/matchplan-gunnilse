@@ -86,6 +86,10 @@ function App() {
         roster={roster}
         assignments={assignments}
       />
+      {taktikOpen && (
+        <TaktikLightbox taktikKey={taktikOpen} roster={roster}
+          onClose={() => setTaktikOpen(null)} />
+      )}
     </>
   );
 }
