@@ -33,6 +33,7 @@ function SecIdentitet({ onOpen, roster }) {
   return (
     <SectionCard num="02" eyebrow="Vem vi är" title="Identitet"
       sectionId="identitet" onOpen={onOpen} roster={roster}>
+      <div className="ref-image"><ZonerBox /></div>
       <Principles items={MP_COHERENCE[1].principles} />
     </SectionCard>
   );
@@ -43,6 +44,7 @@ function SecForsvar({ onOpen, roster }) {
   return (
     <SectionCard num="03" eyebrow="När de har bollen" title="Försvarsspel"
       sectionId="forsvar" onOpen={onOpen} roster={roster}>
+      <div className="ref-image"><Korridorer /></div>
       <Principles items={MP_COHERENCE[2].principles} />
     </SectionCard>
   );
@@ -63,6 +65,7 @@ function SecAnfall({ onOpen, roster }) {
   return (
     <SectionCard num="05" eyebrow="Vi har bollen" title="Anfallsspel"
       sectionId="anfall" onOpen={onOpen} roster={roster}>
+      <div className="ref-image"><Spelytor /></div>
       <Principles items={MP_COHERENCE[4].principles} />
     </SectionCard>
   );
