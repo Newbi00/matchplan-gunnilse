@@ -5,6 +5,7 @@ const path = require('path');
 
 const src = path.join(__dirname, 'matchplan');
 const out = path.join(__dirname, 'matchplan-standalone.html');
+const docs = path.join(__dirname, 'docs');
 
 const read = (f) => fs.readFileSync(path.join(src, f), 'utf8');
 
@@ -48,3 +49,9 @@ html = html.replace(
 
 fs.writeFileSync(out, html);
 console.log(`Wrote ${out} (${html.length} bytes)`);
+
+// Mirror to docs/ for GitHub Pages
+if (!fs.existsSync(docs)) fs.mkdirSync(docs, { recursive: true });
+fs.writeFileSync(path.join(docs, 'index.html'), html);
+fs.copyFileSync(path.join(src, 'og-image.svg'), path.join(docs, 'og-image.svg'));
+console.log(`Wrote ${path.join(docs, 'index.html')} + og-image.svg`);

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <rect width="1200" height="630" fill="#0b1220"/>
+  <rect x="80" y="80" width="1040" height="470" rx="14" fill="#0f1a2e" stroke="#1f2a44" stroke-width="2"/>
+  <line x1="600" y1="80" x2="600" y2="550" stroke="#ffffff33" stroke-width="2"/>
+  <circle cx="600" cy="315" r="70" fill="none" stroke="#ffffff33" stroke-width="2"/>
+  <rect x="80" y="200" width="170" height="230" fill="none" stroke="#ffffff33" stroke-width="2"/>
+  <rect x="950" y="200" width="170" height="230" fill="none" stroke="#ffffff33" stroke-width="2"/>
+  <rect x="430" y="180" width="340" height="270" fill="#eac54f1a" stroke="#eac54f80" stroke-width="2"/>
+  <text x="60" y="48" fill="#eac54f" font-family="system-ui,sans-serif" font-weight="900" font-size="22" letter-spacing="3">MATCHPLANER · 2026</text>
+  <text x="60" y="595" fill="#cbd5e1" font-family="system-ui,sans-serif" font-weight="600" font-size="22">Gunnilse IS  ·  4-3-3  ·  Hemma vs Lerum IS</text>
+  <text x="600" y="330" text-anchor="middle" fill="#eac54f" font-family="system-ui,sans-serif" font-weight="900" font-size="78" letter-spacing="2">MATCHPLAN</text>
+</svg>
