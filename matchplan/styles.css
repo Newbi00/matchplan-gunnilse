@@ -424,3 +424,12 @@ textarea { resize: vertical; }
 .tb-arrow-preview {
   pointer-events: none;
 }
+/* Referensbilder (ZonerBox, Korridorer, Spelytor) */
+.ref-image {
+  margin: 16px 0;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--border, rgba(255,255,255,0.08));
+  background: #0b1220;
+}
+.ref-image svg { display: block; }
