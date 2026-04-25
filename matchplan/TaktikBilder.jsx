@@ -359,13 +359,13 @@ function TaktikBilderThumbs({ sectionId, taktik, roster, onOpen }) {
     </div>
   );
 }
-/* TaktikLightbox — fullscreen-view av en taktikbild med möjlighet att stänga
- * via ×, Escape eller klick-utanför. Interaktivitet (drag, pilar, återställ)
- * kommer i Task 7–8. */
 function TaktikLightbox({ taktikKey, roster, onClose }) {
   const t = window.MP_TAKTIK && window.MP_TAKTIK[taktikKey];
+  const svgRef = useRef(null);
+  const [dots, setDots] = useState(() => t ? t.dots.map(d => ({ ...d })) : []);
+  const [dragId, setDragId] = useState(null);
 
-  // Escape → stäng
+  // Escape-stäng
   useEffect(() => {
     if (!t) return;
     const handler = e => { if (e.key === "Escape") onClose(); };
@@ -373,15 +373,144 @@ function TaktikLightbox({ taktikKey, roster, onClose }) {
     return () => window.removeEventListener("keydown", handler);
   }, [t, onClose]);
 
+  // Reset-funktion — återställ till default
+  const resetDots = () => {
+    if (!t) return;
+    setDots(t.dots.map(d => ({ ...d })));
+  };
+
+  // Hjälpare: konvertera skärm-pixel till SVG-koord
+  const screenToSvg = (clientX, clientY) => {
+    const svg = svgRef.current;
+    if (!svg) return null;
+    const pt = svg.createSVGPoint();
+    pt.x = clientX;
+    pt.y = clientY;
+    const ctm = svg.getScreenCTM();
+    if (!ctm) return null;
+    const svgPt = pt.matrixTransform(ctm.inverse());
+    return { x: svgPt.x, y: svgPt.y };
+  };
+
+  // Pointer event handlers — drag-logik
+  const onPointerDown = (dotId) => (e) => {
+    e.stopPropagation();
+    e.target.setPointerCapture(e.pointerId);
+    setDragId(dotId);
+  };
+  const onPointerMove = (e) => {
+    if (dragId == null) return;
+    const svgPt = screenToSvg(e.clientX, e.clientY);
+    if (!svgPt) return;
+    const scale = window.MP_HALF_VB.scale;
+    // svg-x → yM (bredd), svg-y → xM (djup, 52.5..105)
+    const yM = svgPt.x / scale;
+    const xM = 105 - svgPt.y / scale;
+    // Clamp till motståndarhalvan
+    const clampedXM = Math.max(52.5, Math.min(105, xM));
+    const clampedYM = Math.max(0, Math.min(68, yM));
+    setDots(prev => prev.map(d => d.id === dragId
+      ? { ...d, xM: clampedXM, yM: clampedYM }
+      : d));
+  };
+  const onPointerUp = (e) => {
+    if (dragId == null) return;
+    try { e.target.releasePointerCapture(e.pointerId); } catch (_) { /* ignore */ }
+    setDragId(null);
+  };
+
   if (!t) return null;
+
+  const V = window.MP_HALF_VB;
+  const lbId = `lb-${taktikKey}`;
 
   return (
     <div className="tk-lightbox" onClick={onClose}>
       <div className="tk-lightbox-inner" onClick={e => e.stopPropagation()}>
         <button className="tk-close-btn" onClick={onClose} type="button" aria-label="Stäng">×</button>
+        <div className="tk-toolbar">
+          <button className="tk-tool-btn" type="button" onClick={resetDots}>Återställ</button>
+        </div>
         <div className="tk-svg-wrap">
-          <TaktikHalv id={`lb-${taktikKey}`} title={t.title} dots={t.dots}
-            arrows={t.arrows} zones={t.zones} roster={roster} labelMode="number" />
+          <svg ref={svgRef}
+               viewBox={`0 0 ${V.width} ${V.height}`}
+               xmlns="http://www.w3.org/2000/svg"
+               style={TK_SVG_STYLE}
+               onPointerMove={onPointerMove}
+               onPointerUp={onPointerUp}
+               onPointerCancel={onPointerUp}>
+            <_TaktikPitchDefs id={lbId} />
+            <rect width={V.width} height={V.height} fill={`url(#tk-mow-${lbId})`} />
+            {t.zones && t.zones.map((z, i) => {
+              const tl = window.halfM(z.xMax, z.yMin);
+              const br = window.halfM(z.xMin, z.yMax);
+              const cx = (tl.x + br.x) / 2;
+              const cy = (tl.y + br.y) / 2;
+              return (
+                <g key={`z-${i}`}>
+                  <rect x={tl.x} y={tl.y} width={br.x - tl.x} height={br.y - tl.y}
+                        fill={z.fill} stroke={z.stroke || "none"} strokeWidth="1.5" strokeDasharray="5 4" />
+                  {z.label && (
+                    <text x={cx} y={cy} textAnchor="middle" dominantBaseline="central"
+                          fontFamily="Inter, sans-serif" fontWeight="800" fontSize="12"
+                          fill={z.labelColor || TK_COLORS.white} letterSpacing="1">{z.label}</text>
+                  )}
+                </g>
+              );
+            })}
+            <_TaktikHalfLines />
+            {t.arrows && t.arrows.map((a, i) => {
+              const f = window.halfM(a.from.xM, a.from.yM);
+              const tp = window.halfM(a.to.xM, a.to.yM);
+              const color = a.kind === "ball" ? TK_COLORS.white : a.kind === "pass" ? "hsl(50 95% 60%)" : TK_COLORS.gold;
+              const marker = a.kind === "ball" ? `url(#tk-arrW-${lbId})` : `url(#tk-arrG-${lbId})`;
+              const dash = a.kind === "run" ? "8 5" : a.kind === "pass" ? "10 4" : null;
+              if (a.curve) {
+                const mx = (f.x + tp.x) / 2;
+                const my = (f.y + tp.y) / 2;
+                const dx = tp.x - f.x, dy = tp.y - f.y;
+                const len = Math.hypot(dx, dy) || 1;
+                const ox = -dy / len * a.curve;
+                const oy =  dx / len * a.curve;
+                return (
+                  <path key={`a-${i}`} d={`M ${f.x} ${f.y} Q ${mx + ox} ${my + oy} ${tp.x} ${tp.y}`}
+                        fill="none" stroke={color} strokeWidth="3" strokeLinecap="round"
+                        strokeDasharray={dash || undefined} markerEnd={marker} />
+                );
+              }
+              return (
+                <line key={`a-${i}`} x1={f.x} y1={f.y} x2={tp.x} y2={tp.y}
+                      stroke={color} strokeWidth="3" strokeLinecap="round"
+                      strokeDasharray={dash || undefined} markerEnd={marker} />
+              );
+            })}
+            {dots.map((d, i) => {
+              const p = window.halfM(d.xM, d.yM);
+              const r = d.r != null ? d.r : 20;
+              const label = _taktikLabelFor(d, roster, "number");
+              const fill = d.team === "them" ? TK_COLORS.blue : d.team === "ref" ? "hsl(215 25% 30%)" : TK_COLORS.gold;
+              const stroke = d.team === "us" ? TK_COLORS.goldBright : "hsl(0 0% 100% / 0.6)";
+              const color = d.team === "us" ? TK_COLORS.goldTxt : TK_COLORS.white;
+              const fs = String(label).length > 2 ? r * 0.7 : r * 0.95;
+              return (
+                <g key={d.id || `d-${i}`}
+                   style={{ cursor: "grab", touchAction: "none" }}
+                   onPointerDown={onPointerDown(d.id)}>
+                  <circle cx={p.x} cy={p.y} r={r} fill={fill} stroke={stroke} strokeWidth="2" />
+                  <text x={p.x} y={p.y} textAnchor="middle" dominantBaseline="central"
+                        fontFamily="Inter, sans-serif" fontWeight="900" fontSize={fs} fill={color}
+                        style={{ pointerEvents: "none", userSelect: "none" }}>
+                    {label}
+                  </text>
+                </g>
+              );
+            })}
+            <rect x={V.width / 2 - 170} y={V.height - 54} width={340} height={34} rx="3" fill={TK_COLORS.panelBg} />
+            <text x={V.width / 2} y={V.height - 32} textAnchor="middle"
+                  fontFamily="Inter, sans-serif" fontWeight="900" fontSize="16" fill={TK_COLORS.gold} letterSpacing="1.8">
+              {t.title.toUpperCase()}
+            </text>
+          </svg>
         </div>
       </div>
     </div>

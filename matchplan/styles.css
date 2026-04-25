@@ -511,3 +511,25 @@ textarea { resize: vertical; }
   overflow: auto;
 }
 .tk-svg-wrap svg { max-height: 80vh; }
+.tk-toolbar {
+  display: flex;
+  gap: 8px;
+  padding: 8px 48px 8px 12px;
+  border-bottom: 1px solid var(--border, rgba(255,255,255,0.08));
+  background: rgba(255,255,255,0.02);
+  flex-wrap: wrap;
+}
+.tk-tool-btn {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid var(--border, rgba(255,255,255,0.12));
+  color: var(--fg, #eaeaea);
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  cursor: pointer;
+  transition: background-color 120ms ease, border-color 120ms ease;
+}
+.tk-tool-btn:hover { background: rgba(255,255,255,0.1); border-color: var(--accent, #eac54f); }
+.tk-tool-btn.is-active { background: var(--accent, #eac54f); border-color: var(--accent, #eac54f); color: #0b1220; }
